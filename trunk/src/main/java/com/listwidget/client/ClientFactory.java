@@ -5,7 +5,7 @@ import com.google.gwt.place.shared.PlaceController;
 import com.listwidget.client.mvp.AppPlaceHistoryMapper;
 import com.listwidget.client.ui.EditListView;
 import com.listwidget.client.ui.ListsView;
-import com.listwidget.shared.service.ListkeeperRequestFactory;
+import com.listwidget.shared.service.ListwidgetRequestFactory;
 
 public interface ClientFactory {
 	EventBus getEventBus();
@@ -18,5 +18,5 @@ public interface ClientFactory {
 
 	EditListView getEditListView();
 
-	ListkeeperRequestFactory getRequestFactory();
+	ListwidgetRequestFactory getRequestFactory();
 }

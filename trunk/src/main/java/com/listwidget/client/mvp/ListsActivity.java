@@ -15,8 +15,8 @@ import com.listwidget.client.ui.ListsView.Presenter;
 import com.listwidget.shared.proxy.ItemListProxy;
 import com.listwidget.shared.proxy.ListItemProxy;
 import com.listwidget.shared.proxy.ItemListProxy.ListType;
-import com.listwidget.shared.service.ListkeeperRequestFactory;
-import com.listwidget.shared.service.ListkeeperRequestFactory.ItemListRequestContext;
+import com.listwidget.shared.service.ListwidgetRequestFactory;
+import com.listwidget.shared.service.ListwidgetRequestFactory.ItemListRequestContext;
 
 /**
  * Shows all lists available
@@ -46,7 +46,7 @@ public class ListsActivity extends AbstractActivity implements Activity, Present
 	private void populateLists()
 	{
 		logger.info("firing listAll");
-		ListkeeperRequestFactory rf = this.clientFactory.getRequestFactory();
+		ListwidgetRequestFactory rf = this.clientFactory.getRequestFactory();
 		Request<List<ItemListProxy>> findAllReq = rf.itemListRequest().listAll();
 		findAllReq.fire(new Receiver<List<ItemListProxy>>()
 		{
@@ -61,12 +61,12 @@ public class ListsActivity extends AbstractActivity implements Activity, Present
 	@Override
 	public void persistList(String listName)
 	{
-		final ListkeeperRequestFactory rf = this.clientFactory.getRequestFactory();
+		final ListwidgetRequestFactory rf = this.clientFactory.getRequestFactory();
 		ItemListRequestContext reqCtx = rf.itemListRequest();
 		final ItemListProxy newList = reqCtx.create(ItemListProxy.class);
 		newList.setName(listName);
 		newList.setListType(ListType.TODO);
-		reqCtx.persist(newList).fire(new Receiver<Void>()
+		reqCtx.save(newList).fire(new Receiver<Void>()
 		{
 			@Override
 			public void onSuccess(Void response)

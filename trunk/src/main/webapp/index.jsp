@@ -5,6 +5,11 @@
 <!-- with a "Quirks Mode" doctype may lead to some -->
 <!-- differences in layout.                        -->
 
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ page import="com.google.appengine.api.users.User" %>
+<%@ page import="com.google.appengine.api.users.UserService"%>
+<%@ page import="com.google.appengine.api.users.UserServiceFactory"%>
+
 <html>
   <head>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8">
@@ -34,6 +39,15 @@
   <!--                                           -->
   <body>
 
+<%
+	UserService userService = UserServiceFactory.getUserService();
+	User user = userService.getCurrentUser();
+	
+	// Append query string for GWT dev env
+	String queryString = request.getQueryString();
+	if (queryString == null) queryString = "";
+%>
+
     <!-- OPTIONAL: include this if you want history support -->
     <iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position:absolute;width:0;height:0;border:0"></iframe>
 
@@ -44,5 +58,8 @@
         in order for this application to display correctly.
       </div>
     </noscript>
+
+	You are signed in as <b><%=user.getEmail()%></b><br/>
+	<a href="<%=userService.createLogoutURL("/index.jsp")%>">Sign in with a different account</a>.
 
 </html>

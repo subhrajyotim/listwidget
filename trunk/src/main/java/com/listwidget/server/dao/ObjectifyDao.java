@@ -251,4 +251,9 @@ public class ObjectifyDao<T> extends DAOBase
 
 		return q;
 	}
+	
+	/*
+	 * Convenience methods for RequestFactory
+	 */
+	
 }

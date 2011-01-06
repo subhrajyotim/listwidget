@@ -18,8 +18,8 @@ import com.listwidget.client.ui.EditListView.Presenter;
 import com.listwidget.domain.ListItem;
 import com.listwidget.shared.proxy.ItemListProxy;
 import com.listwidget.shared.proxy.ListItemProxy;
-import com.listwidget.shared.service.ListkeeperRequestFactory;
-import com.listwidget.shared.service.ListkeeperRequestFactory.ItemListRequestContext;
+import com.listwidget.shared.service.ListwidgetRequestFactory;
+import com.listwidget.shared.service.ListwidgetRequestFactory.ItemListRequestContext;
 
 public class EditListActivity extends AbstractActivity implements Presenter
 {
@@ -40,7 +40,7 @@ public class EditListActivity extends AbstractActivity implements Presenter
 	public void start(final AcceptsOneWidget panel, EventBus eventBus)
 	{
 		// Find the entity proxy
-		final ListkeeperRequestFactory req = clientFactory.getRequestFactory();
+		final ListwidgetRequestFactory req = clientFactory.getRequestFactory();
 		EntityProxyId<ItemListProxy> proxyId = req.getProxyId(this.itemListToken);
 		this.itemListId = proxyId;
 		// .with("items") required to retrieve relations
@@ -82,7 +82,7 @@ public class EditListActivity extends AbstractActivity implements Presenter
 			editList.setItems(new ArrayList<ListItemProxy>());
 		}
 		editList.getItems().add(newItem);
-		reqCtx.persist(editList).with("items").to(new Receiver<Void>()
+		reqCtx.save(editList).with("items").to(new Receiver<Void>()
 		{
 			@Override
 			public void onSuccess(Void response)

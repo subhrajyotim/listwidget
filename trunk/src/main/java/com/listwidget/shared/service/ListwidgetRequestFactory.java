@@ -10,7 +10,7 @@ import com.listwidget.server.dao.ItemListDao;
 import com.listwidget.server.locator.DaoServiceLocator;
 import com.listwidget.shared.proxy.ItemListProxy;
 
-public interface ListkeeperRequestFactory extends RequestFactory
+public interface ListwidgetRequestFactory extends RequestFactory
 {
 
 	/**
@@ -23,7 +23,7 @@ public interface ListkeeperRequestFactory extends RequestFactory
 	interface ItemListRequestContext extends RequestContext
 	{
 		Request<List<ItemListProxy>> listAll();
-		Request<Void> persist(ItemListProxy list);
+		Request<Void> save(ItemListProxy list);
 	}
 	
 	ItemListRequestContext itemListRequest();

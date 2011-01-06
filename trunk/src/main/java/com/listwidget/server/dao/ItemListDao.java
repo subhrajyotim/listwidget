@@ -6,11 +6,14 @@ import com.listwidget.domain.ItemList;
 
 public class ItemListDao extends ObjectifyDao<ItemList>
 {
-	public void persist(ItemList list)
+	/**
+	 * Wraps put() so as not to return a Key, which RF can't handle
+	 * 
+	 * @param obj
+	 */
+	public void save(ItemList obj)
 	{
-		Integer version = list.getVersion();
-		list.setVersion(version++);
-		this.put(list);
+		this.put(obj);
 	}
 
 	// Note: requires no args since it's an instance method
@@ -27,7 +30,7 @@ public class ItemListDao extends ObjectifyDao<ItemList>
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 //	public List<ListItem> getItems(ItemList list)
 //	{
 //		return ofy().query(ListItem.class).filter("parent", list.getId()).list();
