@@ -9,14 +9,14 @@ import com.listwidget.client.ui.EditListView;
 import com.listwidget.client.ui.EditListViewImpl;
 import com.listwidget.client.ui.ListsView;
 import com.listwidget.client.ui.ListsViewImpl;
-import com.listwidget.shared.service.ListkeeperRequestFactory;
+import com.listwidget.shared.service.ListwidgetRequestFactory;
 
 public class ClientFactoryImpl implements ClientFactory {
 	private final EventBus eventBus = new SimpleEventBus();
 	private final PlaceController placeController = new PlaceController(
 			eventBus);
 	private final AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
-	private final ListkeeperRequestFactory rf = GWT.create(ListkeeperRequestFactory.class);
+	private final ListwidgetRequestFactory rf = GWT.create(ListwidgetRequestFactory.class);
 	private final ListsView listsView = new ListsViewImpl(this);
 	private final EditListView editListView = new EditListViewImpl();
 
@@ -44,7 +44,7 @@ public class ClientFactoryImpl implements ClientFactory {
 	}
 
 	@Override
-	public ListkeeperRequestFactory getRequestFactory()
+	public ListwidgetRequestFactory getRequestFactory()
 	{
 		return rf;
 	}

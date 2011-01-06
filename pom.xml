@@ -11,7 +11,7 @@
 		<gwt.version>2.1.1</gwt.version>
 		<!-- Default style during dev -->
 		<gwt.style>PRETTY</gwt.style>
-		<gae.version>1.4.0</gae.version>
+		<gae.version>1.3.8</gae.version>
 		<gae.home>${user.home}/.m2/repository/com/google/appengine/appengine-java-sdk/${gae.version}/appengine-java-sdk-${gae.version}</gae.home>
 		<gae.application.version>1</gae.application.version>
 	</properties>
@@ -34,6 +34,14 @@
 			<artifactId>servlet-api</artifactId>
 			<version>2.5</version>
 			<scope>provided</scope>
+		</dependency>
+		<!-- Make use of JSP tags. Remove, if you don't use JSPs -->
+		<dependency>
+			<artifactId>standard</artifactId>
+			<groupId>taglibs</groupId>
+			<version>1.1.2</version>
+			<type>jar</type>
+			<scope>runtime</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.google.appengine</groupId>
@@ -274,7 +282,7 @@
 					<appEngineHome>${gae.home}</appEngineHome>
 					<logLevel>INFO</logLevel>
 					<style>${gwt.style}</style>
-					<runTarget>/index.html</runTarget>
+					<runTarget>/index.jsp</runTarget>
 					<hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
 					<server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
 					<copyWebapp>true</copyWebapp>

@@ -16,6 +16,7 @@ public interface ItemListProxy extends DatastoreObjectProxy
 	void setName(String name);
 	List<ListItemProxy> getItems();
 	ListType getListType();
+	AppUserProxy getOwner();
 	void setListType(ListType type);
 	void setItems(List<ListItemProxy> asList);
 }
