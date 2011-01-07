@@ -8,6 +8,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
+import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.listwidget.client.mvp.AppActivityMapper;
@@ -45,6 +46,9 @@ public class Listkeeper implements EntryPoint
 		RootPanel.get().add(appWidget);
 		// Goes to place represented on URL or default place
 		historyHandler.handleCurrentHistory();
+		
+		// Hide wait GIF
+		DOM.removeChild(RootPanel.getBodyElement(), DOM.getElementById("loading"));
 
 	}
 
