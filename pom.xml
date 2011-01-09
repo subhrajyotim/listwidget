@@ -230,9 +230,6 @@
 				<groupId>net.kindleit</groupId>
 				<artifactId>maven-gae-plugin</artifactId>
 				<version>0.8.0</version>
-				<configuration>
-					<unpackVersion>${gae.version}</unpackVersion>
-				</configuration>
 				<executions>
 					<execution>
 						<id />
@@ -273,6 +270,10 @@
 					<hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
 					<server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
 					<copyWebapp>true</copyWebapp>
+					<!-- Keep duplicate JDT off classpath or module will not load -->
+					<runClasspathExcludes>
+						<runClasspathExclude>jasper-jdt-6.0.29</runClasspathExclude>
+					</runClasspathExcludes>
 				</configuration>
 				<executions>
 					<execution>
@@ -391,6 +392,21 @@
 				<!-- Produce compressed JS during GWT compilation for production environment -->
 				<gwt.style>OBFUSCATED</gwt.style>
 			</properties>
+		</profile>
+
+		<profile>
+			<!-- Add Jasper as workaround to fix JSPs in dev mode with GAE 1.4.0 -->
+			<!-- This puts JDT CompilerOptions on the classpath which correctly -->
+			<!-- targets JDK 1.6 by default -->
+			<id>devmode</id>
+			<dependencies>
+				<dependency>
+					<groupId>org.apache.tomcat</groupId>
+					<artifactId>jasper</artifactId>
+					<version>6.0.29</version>
+					<scope>runtime</scope>
+				</dependency>
+			</dependencies>
 		</profile>
 	</profiles>
 
