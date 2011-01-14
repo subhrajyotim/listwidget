@@ -17,6 +17,17 @@
 		<filter-name>appstats</filter-name>
 		<url-pattern>/*</url-pattern>
 	</filter-mapping>
+
+	<filter>
+		<filter-name>authFilter</filter-name>
+		<filter-class>com.listwidget.server.servlet.AuthFilter</filter-class>
+	</filter>
+
+	<filter-mapping>
+		<filter-name>authFilter</filter-name>
+		<servlet-name>requestFactoryServlet</servlet-name>
+	</filter-mapping>
+
 <!-- Alternate workaround for JDT compilation problem in dev mode on GAE 1.4.0, but breaks prod. Use pom profile instead
 	<servlet>
 		<servlet-name>jsp</servlet-name>
@@ -36,6 +47,7 @@
 		<url-pattern>*.jsp</url-pattern>
 	</servlet-mapping>
  -->
+
 	<!-- Servlets -->
 	<servlet>
 		<servlet-name>requestFactoryServlet</servlet-name>

@@ -10,6 +10,16 @@ public class AppUser extends DatastoreObject
 {
 	private String email;
 
+	public AppUser()
+	{
+		// No-arg constructor required by Objectify
+	}
+	
+	public AppUser(String userEmail)
+	{
+		this.email = userEmail;
+	}
+
 	public String getEmail()
 	{
 		return email;

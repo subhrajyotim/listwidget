@@ -5,8 +5,8 @@ import java.util.List;
 import com.google.gwt.requestfactory.shared.Request;
 import com.google.gwt.requestfactory.shared.RequestContext;
 import com.google.gwt.requestfactory.shared.Service;
-import com.listwidget.server.dao.ObjectifyDao;
 import com.listwidget.server.locator.DaoServiceLocator;
+import com.listwidget.server.service.ObjectifyDao;
 
 /**
  * Base interface for DAO service stubs. Not yet supported in GWT, see

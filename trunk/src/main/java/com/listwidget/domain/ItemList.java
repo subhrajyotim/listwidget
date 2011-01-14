@@ -7,8 +7,7 @@ import javax.persistence.Embedded;
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Entity;
-import com.listwidget.server.dao.AppUserDao;
-import com.listwidget.server.dao.ItemListDao;
+import com.listwidget.server.service.AppUserDao;
 import com.listwidget.shared.proxy.ItemListProxy.ListType;
 
 @Entity
@@ -32,7 +31,6 @@ public class ItemList extends DatastoreObject
 
 	public List<ListItem> getItems()
 	{
-//		return new ItemListDao().getItems(this);
 		return items;
 	}
 

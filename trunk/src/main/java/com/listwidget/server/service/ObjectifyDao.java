@@ -1,4 +1,4 @@
-package com.listwidget.server.dao;
+package com.listwidget.server.service;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -38,7 +38,6 @@ public class ObjectifyDao<T> extends DAOBase
 	{
 		ObjectifyService.register(ItemList.class);
 		ObjectifyService.register(AppUser.class);
-//		ObjectifyService.register(ListItem.class);
 	}
 
 	protected Class<T> clazz;
