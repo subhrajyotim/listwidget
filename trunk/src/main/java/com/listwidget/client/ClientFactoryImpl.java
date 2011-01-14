@@ -4,6 +4,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.SimpleEventBus;
 import com.google.gwt.place.shared.PlaceController;
+import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.listwidget.client.mvp.AppPlaceHistoryMapper;
 import com.listwidget.client.ui.EditListView;
 import com.listwidget.client.ui.EditListViewImpl;
@@ -15,7 +16,7 @@ public class ClientFactoryImpl implements ClientFactory {
 	private final EventBus eventBus = new SimpleEventBus();
 	private final PlaceController placeController = new PlaceController(
 			eventBus);
-	private final AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
+	private final PlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
 	private final ListwidgetRequestFactory rf = GWT.create(ListwidgetRequestFactory.class);
 	private final ListsView listsView = new ListsViewImpl(this);
 	private final EditListView editListView = new EditListViewImpl();
@@ -50,7 +51,7 @@ public class ClientFactoryImpl implements ClientFactory {
 	}
 
 	@Override
-	public AppPlaceHistoryMapper getHistoryMapper()
+	public PlaceHistoryMapper getHistoryMapper()
 	{
 		return historyMapper;
 	}

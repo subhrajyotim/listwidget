@@ -21,7 +21,7 @@ import com.listwidget.shared.service.ListwidgetRequestFactory.ItemListRequestCon
 /**
  * Shows all lists available
  *
- * @author drfibonacci
+ * @author turbomanage
  */
 public class ListsActivity extends AbstractActivity implements Activity, Presenter
 {

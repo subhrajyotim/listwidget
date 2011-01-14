@@ -8,11 +8,11 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryHandler;
+import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.listwidget.client.mvp.AppActivityMapper;
-import com.listwidget.client.mvp.AppPlaceHistoryMapper;
 import com.listwidget.client.mvp.ListsPlace;
 
 public class Listkeeper implements EntryPoint
@@ -39,7 +39,7 @@ public class Listkeeper implements EntryPoint
 		activityManager.setDisplay(appWidget);
 
 		// Start PlaceHistoryHandler with our PlaceHistoryMapper
-		AppPlaceHistoryMapper historyMapper = clientFactory.getHistoryMapper();
+		PlaceHistoryMapper historyMapper = clientFactory.getHistoryMapper();
 		PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
 		historyHandler.register(placeController, eventBus, defaultPlace);
 

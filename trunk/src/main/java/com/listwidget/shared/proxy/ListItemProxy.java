@@ -7,7 +7,7 @@ import com.listwidget.domain.ListItem;
 /**
  * Represents an item in a list
  *
- * @author drfibonacci
+ * @author turbomanage
  */
 @ProxyFor(value = ListItem.class)
 public interface ListItemProxy extends ValueProxy

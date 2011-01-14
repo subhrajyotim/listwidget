@@ -8,7 +8,7 @@ import com.google.gwt.requestfactory.server.ServiceLayerDecorator;
 /**
  * Temporary workaround for http://code.google.com/p/google-web-toolkit/issues/detail?id=5807
  * 
- * @author drfibonacci
+ * @author turbomanage
  */
 public class BugFixRequestFactoryServlet extends RequestFactoryServlet {
 

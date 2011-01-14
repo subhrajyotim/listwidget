@@ -6,7 +6,7 @@ import com.google.gwt.requestfactory.shared.ServiceLocator;
  * Generic locator service that can be referenced in the @Service annotation
  * for any RequestFactory service stub
  *  
- * @author drfibonacci
+ * @author turbomanage
  */
 public class DaoServiceLocator implements ServiceLocator {
 

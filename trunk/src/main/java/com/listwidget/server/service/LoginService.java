@@ -15,7 +15,7 @@ import com.listwidget.shared.TooManyResultsException;
  * Server-side class that provides all login-related
  * operations. Called only from server code.
  * 
- * @author drfibonacci
+ * @author turbomanage
  */
 public class LoginService
 {
