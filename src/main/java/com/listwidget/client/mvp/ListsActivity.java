@@ -47,7 +47,7 @@ public class ListsActivity extends AbstractActivity implements Activity, Present
 	{
 		logger.info("firing listAll");
 		ListwidgetRequestFactory rf = this.clientFactory.getRequestFactory();
-		Request<List<ItemListProxy>> findAllReq = rf.itemListRequest().listAll();
+		Request<List<ItemListProxy>> findAllReq = rf.itemListRequest().listAll().with("owner");
 		findAllReq.fire(new Receiver<List<ItemListProxy>>()
 		{
 			@Override

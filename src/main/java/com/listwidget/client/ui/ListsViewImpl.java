@@ -58,7 +58,7 @@ public class ListsViewImpl extends Composite implements ListsView
 			String historyToken = clientFactory.getHistoryMapper().getToken(new EditListPlace(proxyToken));
 			Hyperlink h = new Hyperlink(list.getName(),historyToken);
 			t.setWidget(i, 0, h);
-//			t.setText(i, 1, list.getOwner().getEmail());
+			t.setText(i, 1, list.getOwner().getEmail());
 			i++;
 		}
 	}

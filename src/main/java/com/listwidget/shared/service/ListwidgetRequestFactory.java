@@ -6,8 +6,8 @@ import com.google.gwt.requestfactory.shared.Request;
 import com.google.gwt.requestfactory.shared.RequestContext;
 import com.google.gwt.requestfactory.shared.RequestFactory;
 import com.google.gwt.requestfactory.shared.Service;
-import com.listwidget.server.dao.ItemListDao;
 import com.listwidget.server.locator.DaoServiceLocator;
+import com.listwidget.server.service.ItemListDao;
 import com.listwidget.shared.proxy.ItemListProxy;
 
 public interface ListwidgetRequestFactory extends RequestFactory
