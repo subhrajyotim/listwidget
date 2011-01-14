@@ -7,7 +7,7 @@ import com.listwidget.domain.DatastoreObject;
 /**
  * Generic @Locator for objects that extend DatastoreObject
  * 
- * @author drfibonacci
+ * @author turbomanage
  */
 public class ObjectifyLocator extends Locator<DatastoreObject	, Long>
 {
