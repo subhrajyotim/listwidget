@@ -9,59 +9,88 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.requestfactory.shared.Receiver;
 import com.google.gwt.requestfactory.shared.Request;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.view.client.AbstractDataProvider;
+import com.google.gwt.view.client.HasData;
 import com.listwidget.client.ClientFactory;
 import com.listwidget.client.ui.ListsView;
 import com.listwidget.client.ui.ListsView.Presenter;
 import com.listwidget.shared.proxy.ItemListProxy;
-import com.listwidget.shared.proxy.ListItemProxy;
 import com.listwidget.shared.proxy.ItemListProxy.ListType;
 import com.listwidget.shared.service.ListwidgetRequestFactory;
 import com.listwidget.shared.service.ListwidgetRequestFactory.ItemListRequestContext;
 
 /**
  * Shows all lists available
- *
+ * 
  * @author turbomanage
  */
-public class ListsActivity extends AbstractActivity implements Activity, Presenter
+public class ListsActivity extends AbstractActivity implements Activity,
+		Presenter
 {
 	private Logger logger = Logger.getLogger(ListsActivity.class.getName());
 	private ClientFactory clientFactory;
-	private ListsView v;
+	private ListsView display;
+	private ListDataProvider listDataProvider;
+
+	public static class ListDataProvider extends
+			AbstractDataProvider<ItemListProxy>
+	{
+		private Logger logger = Logger
+				.getLogger(ListsActivity.ListDataProvider.class.getName());
+		private ListwidgetRequestFactory rf;
+
+		public ListDataProvider(ListwidgetRequestFactory requestFactory)
+		{
+			this.rf = requestFactory;
+		}
+
+		@Override
+		protected void onRangeChanged(HasData<ItemListProxy> display)
+		{
+			getData();
+		}
+
+		private void getData()
+		{
+			Request<List<ItemListProxy>> findAllReq = rf.itemListRequest()
+					.listAll().with("owner");
+			findAllReq.fire(new Receiver<List<ItemListProxy>>()
+			{
+				@Override
+				public void onSuccess(List<ItemListProxy> response)
+				{
+					updateRowData(0, response);
+				}
+			});
+		}
+	}
 
 	public ListsActivity(ClientFactory cf)
 	{
 		this.clientFactory = cf;
+		this.listDataProvider = new ListDataProvider(clientFactory.getRequestFactory());
 	}
 
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus)
 	{
-		v = clientFactory.getListsView();
-		v.setPresenter(this);
-		panel.setWidget(v);
-		populateLists();
+		display = clientFactory.getListsView();
+		display.setPresenter(this);
+		panel.setWidget(display);
+		// Triggers listDataProvider#onRangeChanged() to call for data
+		listDataProvider.addDataDisplay(display.getDisplay());
 	}
 
 	private void populateLists()
 	{
-		logger.info("firing listAll");
-		ListwidgetRequestFactory rf = this.clientFactory.getRequestFactory();
-		Request<List<ItemListProxy>> findAllReq = rf.itemListRequest().listAll().with("owner");
-		findAllReq.fire(new Receiver<List<ItemListProxy>>()
-		{
-			@Override
-			public void onSuccess(List<ItemListProxy> response)
-			{
-				v.populateLists(response);
-			}
-		});
+		listDataProvider.getData();
 	}
 
 	@Override
 	public void persistList(String listName)
 	{
-		final ListwidgetRequestFactory rf = this.clientFactory.getRequestFactory();
+		final ListwidgetRequestFactory rf = this.clientFactory
+				.getRequestFactory();
 		ItemListRequestContext reqCtx = rf.itemListRequest();
 		final ItemListProxy newList = reqCtx.create(ItemListProxy.class);
 		newList.setName(listName);
