@@ -1,8 +1,7 @@
 package com.listwidget.client.ui;
 
-import java.util.List;
-
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.view.client.HasData;
 import com.listwidget.shared.proxy.ItemListProxy;
 
 public interface ListsView extends IsWidget
@@ -14,5 +13,5 @@ public interface ListsView extends IsWidget
 
 	void setPresenter(Presenter p);
 
-	void populateLists(List<ItemListProxy> itemLists);
+	HasData<ItemListProxy> getDisplay();
 }
