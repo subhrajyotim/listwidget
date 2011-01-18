@@ -1,9 +1,11 @@
-package com.listwidget.client.ui;
+package com.listwidget.client.ui.desktop;
 
+import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -16,6 +18,11 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.HasData;
 import com.listwidget.client.ClientFactory;
 import com.listwidget.client.mvp.EditListPlace;
+import com.listwidget.client.mvp.ListsActivity.NameFieldUpdater;
+import com.listwidget.client.ui.ListsView;
+import com.listwidget.client.ui.ListsView.Presenter;
+import com.listwidget.client.ui.widget.HyperlinkCell;
+import com.listwidget.client.ui.widget.MessageWidget;
 import com.listwidget.shared.proxy.ItemListProxy;
 
 public class ListsViewImpl extends Composite implements ListsView
@@ -25,11 +32,18 @@ public class ListsViewImpl extends Composite implements ListsView
 	private Presenter presenter;
 	private ClientFactory clientFactory;
 	private CellTable<ItemListProxy> cellTable = new CellTable<ItemListProxy>();
+	private Column<ItemListProxy, String> nameColumn;
 
+	public ListsViewImpl()
+	{
+		// For GWT Designer
+	}
+	
 	public ListsViewImpl(final ClientFactory clientFactory)
 	{
 		this.clientFactory = clientFactory;
 		initView();
+		vPanel.add(new MessageWidget(clientFactory.getEventBus()));
 		vPanel.add(new Label("New List"));
 		vPanel.add(newListName);
 		initWidget(vPanel);
@@ -46,15 +60,28 @@ public class ListsViewImpl extends Composite implements ListsView
 				return h;
 			}
 		};
-		cellTable.addColumn(linkColumn, "Edit");
 		
+		// Editable column for list name
+		nameColumn = new Column<ItemListProxy,String>(new EditTextCell())
+		{
+			@Override
+			public String getValue(ItemListProxy list)
+			{
+				return list.getName();
+			}
+		};
+		
+		// Display-only column showing owner email
 		TextColumn<ItemListProxy> ownerColumn = new TextColumn<ItemListProxy>() {
 			@Override
 			public String getValue(ItemListProxy list) {
 				return list.getOwner().getEmail();
 			}
 		};
-		cellTable.addColumn(ownerColumn, "Owner");
+		
+		cellTable.addColumn(linkColumn, "Edit");
+//		cellTable.addColumn(nameColumn,"List name");
+//		cellTable.addColumn(ownerColumn, "Owner");
 		
 		vPanel.add(cellTable);
 	}
@@ -91,8 +118,14 @@ public class ListsViewImpl extends Composite implements ListsView
 	}
 
 	@Override
-	public HasData<ItemListProxy> getDisplay()
+	public HasData<ItemListProxy> getDataTable()
 	{
 		return cellTable;
+	}
+
+	@Override
+	public Column<ItemListProxy, String> getNameColumn()
+	{
+		return nameColumn;
 	}
 }

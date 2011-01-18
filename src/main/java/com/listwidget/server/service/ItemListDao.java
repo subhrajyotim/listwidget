@@ -2,6 +2,7 @@ package com.listwidget.server.service;
 
 import java.util.List;
 
+import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.gwt.requestfactory.server.RequestFactoryServlet;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.Query;
@@ -37,19 +38,20 @@ public class ItemListDao extends ObjectifyDao<ItemList>
 	}
 
 	// Note: requires no args since it's an instance method
-//	public ItemList persistAndReturnSelf(ItemList list)
-//	{
-//		ItemListDao dao = new ItemListDao();
-//		Key<ItemList> key = dao.put(list);
-//		try
-//		{
-//			return dao.get(key);
-//		}
-//		catch (EntityNotFoundException e)
-//		{
-//			throw new RuntimeException(e);
-//		}
-//	}
+	public ItemList saveAndReturn(ItemList list)
+	{
+		AppUser loggedInUser = LoginService.getLoggedInUser();
+		list.setOwner(loggedInUser);
+		Key<ItemList> key = this.put(list);
+		try
+		{
+			return this.get(key);
+		}
+		catch (Exception e)
+		{
+			throw new RuntimeException(e);
+		}
+	}
 	
 //	public List<ListItem> getItems(ItemList list)
 //	{

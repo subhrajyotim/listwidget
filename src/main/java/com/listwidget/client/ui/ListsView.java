@@ -1,5 +1,7 @@
 package com.listwidget.client.ui;
 
+import com.google.gwt.user.cellview.client.Column;
+import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.view.client.HasData;
 import com.listwidget.shared.proxy.ItemListProxy;
@@ -12,6 +14,17 @@ public interface ListsView extends IsWidget
 	}
 
 	void setPresenter(Presenter p);
-
-	HasData<ItemListProxy> getDisplay();
+	
+	/**
+	 * Exposes CellTable to the presenter so the AsyncDataProvider can update the table.
+	 * Uses the {@link HasData} interface so as not to leak a Widget into the presenter. 
+	 * @return
+	 */
+	HasData<ItemListProxy> getDataTable();
+	
+	/**
+	 * Exposes column model to the presenter so it can add a field updater
+	 * @return List name column
+	 */
+	Column<ItemListProxy,String> getNameColumn();
 }

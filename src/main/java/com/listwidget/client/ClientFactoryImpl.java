@@ -7,9 +7,9 @@ import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.listwidget.client.mvp.AppPlaceHistoryMapper;
 import com.listwidget.client.ui.EditListView;
-import com.listwidget.client.ui.EditListViewImpl;
 import com.listwidget.client.ui.ListsView;
-import com.listwidget.client.ui.ListsViewImpl;
+import com.listwidget.client.ui.desktop.EditListViewImpl;
+import com.listwidget.client.ui.desktop.ListsViewImpl;
 import com.listwidget.shared.service.ListwidgetRequestFactory;
 
 public class ClientFactoryImpl implements ClientFactory {

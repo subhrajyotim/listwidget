@@ -13,7 +13,7 @@
  * License for the specific language governing permissions and limitations under
  * the License.
  */
-package com.listwidget.client.ui;
+package com.listwidget.client.ui.widget;
 
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.layout.client.Layout;

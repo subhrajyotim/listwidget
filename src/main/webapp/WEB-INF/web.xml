@@ -28,7 +28,7 @@
 		<servlet-name>requestFactoryServlet</servlet-name>
 	</filter-mapping>
 
-<!-- Alternate workaround for JDT compilation problem in dev mode on GAE 1.4.0, but breaks prod. Use pom profile instead
+	<!-- Alternate workaround for JDT compilation problem in dev mode on GAE 
 	<servlet>
 		<servlet-name>jsp</servlet-name>
 		<servlet-class>com.google.appengine.tools.development.PrivilegedJspServlet</servlet-class>
@@ -46,7 +46,8 @@
 		<servlet-name>jsp</servlet-name>
 		<url-pattern>*.jsp</url-pattern>
 	</servlet-mapping>
- -->
+	-->
+
 
 	<!-- Servlets -->
 	<servlet>
