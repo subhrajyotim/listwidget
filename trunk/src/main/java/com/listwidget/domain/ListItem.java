@@ -1,15 +1,22 @@
 package com.listwidget.domain;
 
+import java.util.Date;
+
 
 public class ListItem
 {
 	private String itemText;
-//	private Integer version = 0;
-	// Dummy field due JsonRequestProcessor:1543
-//	transient private ItemList parent;
-//	@Parent
-//	private
-//	Key<ItemList> parentKey;
+	private Date dateCreated;
+	
+	public Date getDateCreated()
+	{
+		return dateCreated;
+	}
+
+	public void setDateCreated(Date dateCreated)
+	{
+		this.dateCreated = dateCreated;
+	}
 
 	public ListItem()
 	{

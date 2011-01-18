@@ -5,7 +5,7 @@ import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.listwidget.client.ClientFactory;
 
-public class AppActivityMapper implements ActivityMapper {
+public class CenterActivityMapper implements ActivityMapper {
 
 	private ClientFactory clientFactory;
 
@@ -15,7 +15,7 @@ public class AppActivityMapper implements ActivityMapper {
 	 *
 	 * @param clientFactory Factory to be passed to activities
 	 */
-	public AppActivityMapper(ClientFactory clientFactory) {
+	public CenterActivityMapper(ClientFactory clientFactory) {
 		super();
 		this.clientFactory = clientFactory;
 	}
@@ -27,11 +27,6 @@ public class AppActivityMapper implements ActivityMapper {
 	public Activity getActivity(Place place) {
 		if (place instanceof EditListPlace) {
 			return new EditListActivity(clientFactory, (EditListPlace) place);
-		}
-
-		if (place instanceof ListsPlace)
-		{
-			return new ListsActivity(clientFactory);
 		}
 		return null;
 	}

@@ -1,4 +1,4 @@
-package com.listwidget.client.ui;
+package com.listwidget.client.ui.widget;
 
 import com.google.gwt.cell.client.AbstractCell;
 import com.google.gwt.cell.client.Cell;

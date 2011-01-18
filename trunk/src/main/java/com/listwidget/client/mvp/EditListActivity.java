@@ -1,21 +1,25 @@
 package com.listwidget.client.mvp;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.*;
+import java.util.logging.Logger;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.cell.client.FieldUpdater;
+import com.google.gwt.event.logical.shared.ValueChangeEvent;
+import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.requestfactory.shared.EntityProxyId;
 import com.google.gwt.requestfactory.shared.Receiver;
 import com.google.gwt.requestfactory.shared.Request;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.view.client.ListDataProvider;
 import com.listwidget.client.ClientFactory;
+import com.listwidget.client.event.MessageEvent;
 import com.listwidget.client.ui.EditListView;
 import com.listwidget.client.ui.EditListView.Presenter;
-import com.listwidget.domain.ListItem;
+import com.listwidget.client.ui.desktop.EditListViewImpl;
+import com.listwidget.client.ui.widget.MessageWidget.MessageType;
 import com.listwidget.shared.proxy.ItemListProxy;
 import com.listwidget.shared.proxy.ListItemProxy;
 import com.listwidget.shared.service.ListwidgetRequestFactory;
@@ -29,6 +33,8 @@ public class EditListActivity extends AbstractActivity implements Presenter
 	private ItemListProxy editList;
 	private EditListView view;
 	private String itemListToken;
+	private ListDataProvider<ListItemProxy> itemsProvider;
+	private EventBus eventBus;
 
 	public EditListActivity(ClientFactory cf, EditListPlace editListPlace)
 	{
@@ -39,30 +45,39 @@ public class EditListActivity extends AbstractActivity implements Presenter
 	@Override
 	public void start(final AcceptsOneWidget panel, EventBus eventBus)
 	{
+		this.eventBus = eventBus;
 		// Find the entity proxy
 		final ListwidgetRequestFactory req = clientFactory.getRequestFactory();
-		EntityProxyId<ItemListProxy> proxyId = req.getProxyId(this.itemListToken);
+		EntityProxyId<ItemListProxy> proxyId = req
+				.getProxyId(this.itemListToken);
 		this.itemListId = proxyId;
 		// .with("items") required to retrieve relations
-		logger.info("Finding list");
-		Request<ItemListProxy> findReq = clientFactory.getRequestFactory().find(itemListId).with("items");
+		Request<ItemListProxy> findReq = clientFactory.getRequestFactory()
+				.find(itemListId).with("items");
 		view = clientFactory.getEditListView();
 		findReq.fire(new Receiver<ItemListProxy>()
 		{
 			@Override
 			public void onSuccess(ItemListProxy itemList)
 			{
-				// Gotcha--if do this, must call panel.setWidget in onSuccess also
+				// Gotcha--if do this, must call panel.setWidget in onSuccess
+				// also
 				assert (view != null);
 				assert itemList != null;
 				editList = itemList;
-				view.setListName(itemList.getName());
-				view.setListType(itemList.getListType());
-				view.populateItems(itemList.getItems());
+				view.getListName().setValue(itemList.getName());
+				List<ListItemProxy> items = itemList.getItems();
+				if (items == null)
+				{
+					items = new ArrayList<ListItemProxy>();
+				}
+				itemsProvider = new ListDataProvider<ListItemProxy>(items);
+				itemsProvider.addDataDisplay(view.getDataTable());
 			}
 		});
+		view.getItemTextColumn().setFieldUpdater(new ItemsUpdater());
 		// Gotcha--make sure it's not null if you expect to see anything
-		panel.setWidget(view);
+		panel.setWidget(clientFactory.getEditListView());
 		view.setPresenter(this);
 	}
 
@@ -70,14 +85,15 @@ public class EditListActivity extends AbstractActivity implements Presenter
 	public void addItem(String itemText)
 	{
 		logger.info("persisting new listitem");
-		ItemListRequestContext reqCtx = clientFactory.getRequestFactory().itemListRequest();
+		ItemListRequestContext reqCtx = clientFactory.getRequestFactory()
+				.itemListRequest();
 		ListItemProxy newItem = reqCtx.create(ListItemProxy.class);
 		newItem.setItemText(itemText);
 		// Required?
 		editList = reqCtx.edit(editList);
-//		newItem.setParent(editList);
+		// newItem.setParent(editList);
 		List<ListItemProxy> items = editList.getItems();
-		if (items==null)
+		if (items == null)
 		{
 			editList.setItems(new ArrayList<ListItemProxy>());
 		}
@@ -87,9 +103,52 @@ public class EditListActivity extends AbstractActivity implements Presenter
 			@Override
 			public void onSuccess(Void response)
 			{
-				view.populateItems(editList.getItems());
+				logger.info("updating itesm");
+				itemsProvider.setList(editList.getItems());
+				itemsProvider.refresh();
 			}
 		}).fire();
 	}
 
+	private class ItemsUpdater implements FieldUpdater<ListItemProxy, String>
+	{
+		@Override
+		public void update(int index, ListItemProxy item, final String newText)
+		{
+			ItemListRequestContext reqCtx = clientFactory.getRequestFactory()
+					.itemListRequest();
+			ListItemProxy editItem = reqCtx.edit(item);
+			editItem.setItemText(newText);
+			editList = reqCtx.edit(editList);
+			editList.getItems().set(index, editItem);
+			// Save the list since items are embedded
+			reqCtx.save(editList).fire(new Receiver<Void>()
+			{
+				@Override
+				public void onSuccess(Void response)
+				{
+					eventBus.fireEvent(new MessageEvent(newText + " updated",
+							MessageType.INFO));
+				}
+			});
+		}
+	}
+
+	@Override
+	public void updateListName(String newName)
+	{
+		ItemListRequestContext reqCtx = clientFactory.getRequestFactory()
+				.itemListRequest();
+		editList = reqCtx.edit(editList);
+		editList.setName(newName);
+		reqCtx.save(editList).fire(new Receiver<Void>()
+		{
+			@Override
+			public void onSuccess(Void response)
+			{
+				eventBus.fireEvent(new MessageEvent("List name updated",
+						MessageType.INFO));
+			}
+		});
+	};
 }

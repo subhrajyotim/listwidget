@@ -5,9 +5,10 @@ import com.google.gwt.activity.shared.ActivityMapper;
 import com.google.gwt.place.shared.Place;
 import com.listwidget.client.ClientFactory;
 
-public class AppActivityMapper implements ActivityMapper {
+public class WestActivityMapper implements ActivityMapper {
 
 	private ClientFactory clientFactory;
+	private ListsActivity listsActivity;
 
 	/**
 	 * AppActivityMapper associates each Place with its corresponding
@@ -15,9 +16,10 @@ public class AppActivityMapper implements ActivityMapper {
 	 *
 	 * @param clientFactory Factory to be passed to activities
 	 */
-	public AppActivityMapper(ClientFactory clientFactory) {
+	public WestActivityMapper(ClientFactory clientFactory) {
 		super();
 		this.clientFactory = clientFactory;
+		this.listsActivity = new ListsActivity(clientFactory);
 	}
 
 	/**
@@ -25,15 +27,8 @@ public class AppActivityMapper implements ActivityMapper {
 	 */
 	@Override
 	public Activity getActivity(Place place) {
-		if (place instanceof EditListPlace) {
-			return new EditListActivity(clientFactory, (EditListPlace) place);
-		}
-
-		if (place instanceof ListsPlace)
-		{
-			return new ListsActivity(clientFactory);
-		}
-		return null;
+		// Always return the listsActivity
+		return listsActivity;
 	}
 
 }
