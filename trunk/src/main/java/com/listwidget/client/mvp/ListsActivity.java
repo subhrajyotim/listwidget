@@ -60,8 +60,10 @@ public class ListsActivity extends AbstractActivity implements Activity,
 
 		private void getData()
 		{
+			// To retrieve relations and value types, use .with()
 			Request<List<ItemListProxy>> findAllReq = rf.itemListRequest()
 					.listAll().with("owner");
+			// Receiver specifies return type
 			findAllReq.fire(new Receiver<List<ItemListProxy>>()
 			{
 				@Override
@@ -76,7 +78,8 @@ public class ListsActivity extends AbstractActivity implements Activity,
 	public ListsActivity(ClientFactory cf)
 	{
 		this.clientFactory = cf;
-		this.listDataProvider = new ListDataProvider(clientFactory.getRequestFactory());
+		this.listDataProvider = new ListDataProvider(
+				clientFactory.getRequestFactory());
 	}
 
 	@Override
@@ -108,32 +111,31 @@ public class ListsActivity extends AbstractActivity implements Activity,
 			{
 				// Refresh table
 				listDataProvider.getData();
-				Scheduler.get().scheduleDeferred(new Command()
-				{
-					@Override
-					public void execute()
-					{
-						// Go to edit place for the new list
-						String proxyToken = clientFactory.getRequestFactory().getHistoryToken(newList.stableId());
-						String historyToken = clientFactory.getHistoryMapper().getToken(new EditListPlace(proxyToken));
-						clientFactory.getPlaceController().goTo(new EditListPlace(proxyToken));
-					}
-				});
+				// Go to edit place for the new list
+				String proxyToken = clientFactory.getRequestFactory()
+						.getHistoryToken(newList.stableId());
+				String historyToken = clientFactory.getHistoryMapper()
+						.getToken(new EditListPlace(proxyToken));
+				clientFactory.getPlaceController().goTo(
+						new EditListPlace(proxyToken));
 			}
 		});
 	}
 
 	/**
-	 * Updater for the editable list name column. Must be in presenter because needs to fire requests
-	 *  
+	 * Updater for the editable list name column. Must be in presenter because
+	 * needs to fire requests
+	 * 
 	 * @author David Chandler
 	 */
-	public class NameFieldUpdater implements FieldUpdater<ItemListProxy,String>
+	public class NameFieldUpdater implements
+			FieldUpdater<ItemListProxy, String>
 	{
 		@Override
 		public void update(int index, ItemListProxy obj, final String newName)
 		{
-			ItemListRequestContext reqCtx = clientFactory.getRequestFactory().itemListRequest();
+			ItemListRequestContext reqCtx = clientFactory.getRequestFactory()
+					.itemListRequest();
 			ItemListProxy editable = reqCtx.edit(obj);
 			editable.setName(newName);
 			reqCtx.save(editable).fire(new Receiver<Void>()
@@ -141,10 +143,11 @@ public class ListsActivity extends AbstractActivity implements Activity,
 				@Override
 				public void onSuccess(Void response)
 				{
-					eventBus.fireEvent(new MessageEvent(newName + " updated",MessageType.INFO));
+					eventBus.fireEvent(new MessageEvent(newName + " updated",
+							MessageType.INFO));
 				}
 			});
 		}
 	};
-	
+
 }

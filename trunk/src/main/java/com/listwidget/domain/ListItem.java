@@ -3,7 +3,7 @@ package com.listwidget.domain;
 import java.util.Date;
 
 
-public class ListItem
+public class ListItem // POJO
 {
 	private String itemText;
 	private Date dateCreated;

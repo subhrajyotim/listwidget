@@ -14,15 +14,7 @@ public class ItemListDao extends ObjectifyDao<ItemList>
 	@Override
 	public List<ItemList> listAll()
 	{
-		// Find all lists for logged in user
-		AppUser loggedInUser = (AppUser) RequestFactoryServlet.getThreadLocalRequest().getAttribute("loggedInUser");
-		if (loggedInUser != null)
-		{
-			Key<AppUser> ownerKey = new AppUserDao().key(loggedInUser);
-			Query<ItemList> q = ofy().query(ItemList.class);
-			return q.filter("owner", ownerKey).list();
-		}
-		return null;
+		return this.listAllForUser();
 	}
 
 	/**
