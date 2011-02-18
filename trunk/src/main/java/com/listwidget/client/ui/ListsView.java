@@ -11,6 +11,8 @@ public interface ListsView extends IsWidget
 	interface Presenter
 	{
 		void persistList(String listName);
+
+		void removeList(ItemListProxy list);
 	}
 
 	void setPresenter(Presenter p);

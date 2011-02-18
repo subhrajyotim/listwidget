@@ -25,6 +25,7 @@ public interface ListwidgetRequestFactory extends RequestFactory
 		Request<List<ItemListProxy>> listAll();
 		Request<Void> save(ItemListProxy list);
 		Request<ItemListProxy> saveAndReturn(ItemListProxy newList);
+		Request<Void> removeList(ItemListProxy list);
 	}
 	
 	ItemListRequestContext itemListRequest();

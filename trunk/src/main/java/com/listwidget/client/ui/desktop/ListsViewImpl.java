@@ -1,11 +1,12 @@
 package com.listwidget.client.ui.desktop;
 
+import com.google.gwt.cell.client.ActionCell;
+import com.google.gwt.cell.client.ActionCell.Delegate;
 import com.google.gwt.cell.client.EditTextCell;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.user.cellview.client.CellList;
 import com.google.gwt.user.cellview.client.CellTable;
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.cellview.client.TextColumn;
@@ -18,9 +19,7 @@ import com.google.gwt.user.client.ui.VerticalPanel;
 import com.google.gwt.view.client.HasData;
 import com.listwidget.client.ClientFactory;
 import com.listwidget.client.mvp.EditListPlace;
-import com.listwidget.client.mvp.ListsActivity.NameFieldUpdater;
 import com.listwidget.client.ui.ListsView;
-import com.listwidget.client.ui.ListsView.Presenter;
 import com.listwidget.client.ui.widget.HyperlinkCell;
 import com.listwidget.client.ui.widget.MessageWidget;
 import com.listwidget.shared.proxy.ItemListProxy;
@@ -70,7 +69,42 @@ public class ListsViewImpl extends Composite implements ListsView
 				return list.getName();
 			}
 		};
-		
+
+		ActionCell<ItemListProxy> actionCell = new ActionCell<ItemListProxy>("Del",new Delegate<ItemListProxy>()
+		{
+			@Override
+			public void execute(ItemListProxy object)
+			{
+				presenter.removeList(object);
+			}
+		});
+		Column<ItemListProxy, ItemListProxy> delColumn = new Column<ItemListProxy, ItemListProxy>(actionCell)
+		{
+			@Override
+			public ItemListProxy getValue(ItemListProxy object)
+			{
+				return object;
+			}
+		};
+//		Column<ItemListProxy, Anchor> delColumn = new Column<ItemListProxy, Anchor>(new AnchorCell())
+//		{
+//			@Override
+//			public Anchor getValue(final ItemListProxy list)
+//			{
+//				Anchor a = new Anchor("Del");
+//				a.addClickHandler(new ClickHandler()
+//				{
+//					@Override
+//					public void onClick(ClickEvent event)
+//					{
+//						Window.alert("got click"	);
+//						presenter.removeList(list);
+//					}
+//				});
+//				return a;
+//			}
+//		};
+
 		// Display-only column showing owner email
 		TextColumn<ItemListProxy> ownerColumn = new TextColumn<ItemListProxy>() {
 			@Override
@@ -80,6 +114,7 @@ public class ListsViewImpl extends Composite implements ListsView
 		};
 		
 		cellTable.addColumn(linkColumn, "Edit");
+		cellTable.addColumn(delColumn, "Del");
 //		cellTable.addColumn(nameColumn,"List name");
 //		cellTable.addColumn(ownerColumn, "Owner");
 		

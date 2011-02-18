@@ -6,13 +6,9 @@ import java.util.logging.Logger;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.requestfactory.shared.Receiver;
 import com.google.gwt.requestfactory.shared.Request;
-import com.google.gwt.user.client.Command;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
@@ -57,9 +53,10 @@ public class ListsActivity extends AbstractActivity implements Activity,
 		{
 			getData();
 		}
-
+		
 		private void getData()
 		{
+			logger.warning("getting data");
 			// To retrieve relations and value types, use .with()
 			Request<List<ItemListProxy>> findAllReq = rf.itemListRequest()
 					.listAll().with("owner");
@@ -69,6 +66,7 @@ public class ListsActivity extends AbstractActivity implements Activity,
 				@Override
 				public void onSuccess(List<ItemListProxy> response)
 				{
+					updateRowCount(response.size(), true);
 					updateRowData(0, response);
 				}
 			});
@@ -148,6 +146,20 @@ public class ListsActivity extends AbstractActivity implements Activity,
 				}
 			});
 		}
+	}
+
+	@Override
+	public void removeList(ItemListProxy list)
+	{
+		ItemListRequestContext reqCtx = clientFactory.getRequestFactory().itemListRequest();
+		reqCtx.removeList(list).fire(new Receiver<Void>()
+		{
+			@Override
+			public void onSuccess(Void response)
+			{
+				listDataProvider.getData();
+			}
+		});
 	};
 
 }
