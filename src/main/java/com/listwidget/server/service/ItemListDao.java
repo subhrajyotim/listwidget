@@ -9,6 +9,10 @@ import com.googlecode.objectify.Query;
 import com.listwidget.domain.AppUser;
 import com.listwidget.domain.ItemList;
 
+/**
+ * @author drfibonacci
+ *
+ */
 public class ItemListDao extends ObjectifyDao<ItemList>
 {
 	@Override
@@ -45,9 +49,14 @@ public class ItemListDao extends ObjectifyDao<ItemList>
 		}
 	}
 	
-//	public List<ListItem> getItems(ItemList list)
-//	{
-//		return ofy().query(ListItem.class).filter("parent", list.getId()).list();
-//	}
-
+	/**
+	 * Remove a list. Since items are embedded, they are removed automatically.
+	 * 
+	 * @param list
+	 */
+	public void removeList(ItemList list)
+	{
+		this.delete(list);
+	}
+	
 }
