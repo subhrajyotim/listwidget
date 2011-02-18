@@ -35,7 +35,7 @@
 
   <!-- Specify the app entry point class.                         -->
   <!-- <entry-point class='com.listwidget.client.Listkeeper'/> -->
-  <entry-point class="com.listwidget.client.ui.desktop.DesktopApp"/>
+  <entry-point class="com.listwidget.client.Listkeeper"/>
 
   <!-- Specify the paths for translatable code                    -->
   <source path='client'/>

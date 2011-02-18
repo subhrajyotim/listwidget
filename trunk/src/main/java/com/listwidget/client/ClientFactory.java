@@ -19,4 +19,6 @@ public interface ClientFactory {
 	EditListView getEditListView();
 
 	ListwidgetRequestFactory getRequestFactory();
+
+	ListwidgetApp getApp();
 }

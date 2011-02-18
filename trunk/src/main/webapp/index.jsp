@@ -58,8 +58,11 @@
       </div>
     </noscript>
 
+	<div id="userinfo">
 	You are signing in as <b><%=user.getEmail()%></b><br/>
 	<a href="<%=userService.createLogoutURL("/index.jsp")%>">Sign in with a different account</a>.
+	</div>
+	<div id="gwt"></div>
 
 	<div id="loading">Loading...<BR />
 		<img src="/images/wait.gif" alt="loading...">
