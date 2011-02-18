@@ -11,42 +11,48 @@ import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.DockLayoutPanel;
+import com.google.gwt.user.client.ui.DockPanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.listwidget.client.ClientFactory;
+import com.listwidget.client.ListwidgetApp;
 import com.listwidget.client.mvp.AppActivityMapper;
 import com.listwidget.client.mvp.CenterActivityMapper;
 import com.listwidget.client.mvp.ListsPlace;
 import com.listwidget.client.mvp.WestActivityMapper;
 
-public class DesktopApp implements EntryPoint
+public class DesktopApp implements ListwidgetApp
 {
-	private ClientFactory clientFactory = GWT.create(ClientFactory.class);
 	private Place defaultPlace = new ListsPlace();
+	private final ClientFactory clientFactory;
 
-	public void onModuleLoad()
+	public DesktopApp(ClientFactory clientFactory)
 	{
-		/**
-		 * This is the entry point method.
-		 */
-		RootPanel rootPanel = RootPanel.get();
+		this.clientFactory = clientFactory;
+	}
 	
-		DockLayoutPanel dockLayoutPanel = new DockLayoutPanel(Unit.PCT);
-		rootPanel.add(dockLayoutPanel, 10, 10);
-		
-		SimplePanel westPanel = new SimplePanel();
-		dockLayoutPanel.addWest(westPanel, 20);
-		
-		SimplePanel centerPanel = new SimplePanel();
-		dockLayoutPanel.add(centerPanel);
-		
-		// Create ClientFactory using deferred binding so we can replace with
-		// different
-		// impls in gwt.xml
+	public Widget getAppWidget()
+	{
 		EventBus eventBus = clientFactory.getEventBus();
 		PlaceController placeController = clientFactory.getPlaceController();
+		
+		/*
+		 * The new DockLayoutPanel attaches to the whole browser window because it
+		 * uses absolute positioning to get improved efficiency in the browser.
+		 * But we want to run the GWT app in a div (not the whole page), so we have
+		 * to use the older DockPanel instead.
+		 */
+		DockPanel dockPanel = new DockPanel();
+		dockPanel.setSpacing(20);
+		
+		SimplePanel westPanel = new SimplePanel();
+		dockPanel.add(westPanel, DockPanel.WEST);
+//		dockLayoutPanel.addWest(westPanel, 20);
+		
+		SimplePanel centerPanel = new SimplePanel();
+		dockPanel.add(centerPanel, DockPanel.CENTER);
 		
 		// Start ActivityManager for the nav (west) panel with our WestActivityMapper
 		ActivityMapper westActivityMapper = new WestActivityMapper(clientFactory);
@@ -58,16 +64,7 @@ public class DesktopApp implements EntryPoint
 		ActivityManager centerActivityManager = new ActivityManager(centerActivityMapper, eventBus);
 		centerActivityManager.setDisplay(centerPanel);
 		
-		// Start PlaceHistoryHandler with our PlaceHistoryMapper
-		PlaceHistoryMapper historyMapper = clientFactory.getHistoryMapper();
-		PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);
-		historyHandler.register(placeController, eventBus, defaultPlace);
-
-		RootPanel.get().add(dockLayoutPanel);
-		// Goes to place represented on URL or default place
-		historyHandler.handleCurrentHistory();
-		
-		// Hide wait GIF
-		DOM.removeChild(RootPanel.getBodyElement(), DOM.getElementById("loading"));
+		return dockPanel;
 	}
+
 }

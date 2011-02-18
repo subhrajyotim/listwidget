@@ -8,6 +8,7 @@ import com.google.gwt.place.shared.PlaceHistoryMapper;
 import com.listwidget.client.mvp.AppPlaceHistoryMapper;
 import com.listwidget.client.ui.EditListView;
 import com.listwidget.client.ui.ListsView;
+import com.listwidget.client.ui.desktop.DesktopApp;
 import com.listwidget.client.ui.desktop.EditListViewImpl;
 import com.listwidget.client.ui.desktop.ListsViewImpl;
 import com.listwidget.shared.service.ListwidgetRequestFactory;
@@ -20,6 +21,7 @@ public class ClientFactoryImpl implements ClientFactory {
 	private final ListwidgetRequestFactory rf = GWT.create(ListwidgetRequestFactory.class);
 	private final ListsView listsView = new ListsViewImpl(this);
 	private final EditListView editListView = new EditListViewImpl();
+	private final ListwidgetApp app = new DesktopApp(this);
 
 	public ClientFactoryImpl()
 	{
@@ -60,5 +62,11 @@ public class ClientFactoryImpl implements ClientFactory {
 	public EditListView getEditListView()
 	{
 		return editListView;
+	}
+
+	@Override
+	public ListwidgetApp getApp()
+	{
+		return app;
 	}
 }
