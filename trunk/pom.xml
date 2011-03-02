@@ -249,7 +249,8 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>gwt-maven-plugin</artifactId>
-				<version>2.1.0-1</version>
+				<version>${gwt.version}</version>
+<!--
 				<dependencies>
 					<dependency>
 						<groupId>com.google.gwt</groupId>
@@ -267,12 +268,13 @@
 						<version>${gwt.version}</version>
 					</dependency>
 				</dependencies>
+-->
 				<configuration>
 					<appEngineVersion>${gae.version}</appEngineVersion>
 					<appEngineHome>${gae.home}</appEngineHome>
 					<logLevel>INFO</logLevel>
 					<style>${gwt.style}</style>
-					<runTarget>/index.html</runTarget>
+					<runTarget>/index.jsp</runTarget>
 					<hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
 					<server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
 					<copyWebapp>true</copyWebapp>
