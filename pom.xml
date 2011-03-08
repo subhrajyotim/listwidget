@@ -330,7 +330,7 @@
 					</execution>
 					<execution>
 						<id>remove-gwt-client-classes</id>
-						<phase>post-installation-test</phase>
+						<phase>package</phase>
 						<goals>
 							<goal>clean</goal>
 						</goals>
