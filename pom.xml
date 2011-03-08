@@ -301,7 +301,7 @@
 				<executions>
 					<execution>
 						<id>bundle-into-jar</id>
-						<phase>release</phase>
+						<phase>prepare-package</phase>
 						<goals>
 							<goal>jar</goal>
 						</goals>
@@ -330,7 +330,7 @@
 					</execution>
 					<execution>
 						<id>remove-gwt-client-classes</id>
-						<phase>verify</phase>
+						<phase>post-installation-test</phase>
 						<goals>
 							<goal>clean</goal>
 						</goals>
@@ -341,6 +341,12 @@
 									<directory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</directory>
 									<includes>
 										<include>**</include>
+									</includes>
+								</fileset>
+								<fileset>
+									<directory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</directory>
+									<includes>
+										<include>gwt-user*jar</include>
 									</includes>
 								</fileset>
 							</filesets>
