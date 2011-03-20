@@ -19,6 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.Scheduler;
+import com.google.gwt.core.client.Scheduler.ScheduledCommand;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.logical.shared.HasValueChangeHandlers;
 import com.google.gwt.event.logical.shared.ValueChangeEvent;
@@ -32,12 +34,10 @@ import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Timer;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.Image;
-import com.google.gwt.widgetideas.client.ResizableWidget;
-import com.google.gwt.widgetideas.client.ResizableWidgetCollection;
+import com.google.gwt.user.client.ui.RequiresResize;
 
 /**
  * A widget that allows the user to select a value within a range of possible
@@ -46,7 +46,8 @@ import com.google.gwt.widgetideas.client.ResizableWidgetCollection;
  * <h3>Keyboard Events</h3>
  * <p>
  * SliderBar listens for the following key events. Holding down a key will
- * repeat the action until the key is released. <ul class='css'>
+ * repeat the action until the key is released.
+ * <ul class='css'>
  * <li>left arrow - shift left one step</li>
  * <li>right arrow - shift right one step</li>
  * <li>ctrl+left arrow - jump left 10% of the distance</li>
@@ -57,19 +58,25 @@ import com.google.gwt.widgetideas.client.ResizableWidgetCollection;
  * </ul>
  * </p>
  * 
- * <h3>CSS Style Rules</h3> <ul class='css'> <li>.gwt-SliderBar-shell { primary
- * style }</li> <li>.gwt-SliderBar-shell-focused { primary style when focused }</li>
+ * <h3>CSS Style Rules</h3>
+ * <ul class='css'>
+ * <li>.gwt-SliderBar-shell { primary style }</li>
+ * <li>.gwt-SliderBar-shell-focused { primary style when focused }</li>
  * <li>.gwt-SliderBar-shell gwt-SliderBar-line { the line that the knob moves
- * along }</li> <li>.gwt-SliderBar-shell gwt-SliderBar-line-sliding { the line
- * that the knob moves along when sliding }</li> <li>.gwt-SliderBar-shell
- * .gwt-SliderBar-knob { the sliding knob }</li> <li>.gwt-SliderBar-shell
- * .gwt-SliderBar-knob-sliding { the sliding knob when sliding }</li> <li>
+ * along }</li>
+ * <li>.gwt-SliderBar-shell gwt-SliderBar-line-sliding { the line that the knob
+ * moves along when sliding }</li>
+ * <li>.gwt-SliderBar-shell .gwt-SliderBar-knob { the sliding knob }</li>
+ * <li>.gwt-SliderBar-shell .gwt-SliderBar-knob-sliding { the sliding knob when
+ * sliding }</li>
+ * <li>
  * .gwt-SliderBar-shell .gwt-SliderBar-tick { the ticks along the line }</li>
  * <li>.gwt-SliderBar-shell .gwt-SliderBar-label { the text labels along the
- * line }</li> </ul>
+ * line }</li>
+ * </ul>
  */
-public class SliderBar extends FocusPanel implements ResizableWidget,
-    HasValue<Double>, HasValueChangeHandlers<Double> {
+public class SliderBar extends FocusPanel implements RequiresResize, HasValue<Double>,
+    HasValueChangeHandlers<Double> {
   /**
    * A formatter used to format the labels displayed in the widget.
    */
@@ -90,7 +97,8 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
    * A {@link ClientBundle} that provides images for {@link SliderBar}.
    */
   public static interface SliderBarImages extends ClientBundle {
-	  public static final SliderBarImages INSTANCE = GWT.create(SliderBarImages.class);
+    public static final SliderBarImages INSTANCE = GWT.create(SliderBarImages.class);
+
     /**
      * An image used for the sliding knob.
      * 
@@ -114,11 +122,12 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
      */
     @Source("sliderSliding.gif")
     ImageResource sliderSliding();
-    
-    @NotStrict @Source("SliderBar.css")
+
+    @NotStrict
+    @Source("SliderBar.css")
     CssResource sliderBarCss();
   }
-  
+
   /**
    * The timer used to continue to shift the knob as the user holds down one of
    * the left/right arrow keys. Only IE auto-repeats, so we just keep catching
@@ -290,10 +299,8 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
    * @param maxValue the maximum value in the range
    * @param labelFormatter the label formatter
    */
-  public SliderBar(double minValue, double maxValue,
-      LabelFormatter labelFormatter) {
-    this(minValue, maxValue, labelFormatter,
-        SliderBarImages.INSTANCE	);
+  public SliderBar(double minValue, double maxValue, LabelFormatter labelFormatter) {
+    this(minValue, maxValue, labelFormatter, SliderBarImages.INSTANCE);
   }
 
   /**
@@ -304,8 +311,8 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
    * @param labelFormatter the label formatter
    * @param images the images to use for the slider
    */
-  public SliderBar(double minValue, double maxValue,
-      LabelFormatter labelFormatter, SliderBarImages images) {
+  public SliderBar(double minValue, double maxValue, LabelFormatter labelFormatter,
+      SliderBarImages images) {
     super();
     images.sliderBarCss().ensureInjected();
     this.minValue = minValue;
@@ -547,8 +554,7 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
    */
   public void onResize(int width, int height) {
     // Center the line in the shell
-//    int lineWidth = DOM.getElementPropertyInt(lineElement, "offsetWidth");
-	  int lineWidth = lineElement.getOffsetWidth();
+    int lineWidth = lineElement.getOffsetWidth();
     lineLeftOffset = (width / 2) - (lineWidth / 2);
     DOM.setStyleAttribute(lineElement, "left", lineLeftOffset + "px");
 
@@ -563,9 +569,7 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
    */
   public void redraw() {
     if (isAttached()) {
-//      int width = DOM.getElementPropertyInt(getElement(), "clientWidth");
       int width = getElement().getClientWidth();
-//      int height = DOM.getElementPropertyInt(getElement(), "clientHeight");
       int height = getElement().getClientHeight();
       onResize(width, height);
     }
@@ -593,14 +597,13 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
     this.curValue -= remainder;
 
     // Go to next step if more than halfway there
-    if ((remainder > (stepSize / 2))
-        && ((this.curValue + stepSize) <= maxValue)) {
+    if ((remainder > (stepSize / 2)) && ((this.curValue + stepSize) <= maxValue)) {
       this.curValue += stepSize;
     }
 
     // Redraw the knob
     drawKnob();
-    
+
     // Fire the ValueChangeEvent
     if (fireEvent) {
       ValueChangeEvent.fire(this, this.curValue);
@@ -776,13 +779,15 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
   protected void onLoad() {
     // Reset the position attribute of the parent element
     DOM.setStyleAttribute(getElement(), "position", "relative");
-    ResizableWidgetCollection.get().add(this);
-    redraw();
-  }
-
-  @Override
-  protected void onUnload() {
-    ResizableWidgetCollection.get().remove(this);
+    // workaround to render properly when parent Widget does not
+    // implement ProvidesResize since DOM doesn't provide element
+    // height and width until onModuleLoad() finishes.
+    Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+      @Override
+      public void execute() {
+        onResize();
+      }
+    });
   }
 
   /**
@@ -796,13 +801,10 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
 
     // Move the knob to the correct position
     Element knobElement = knobImage.getElement();
-//    int lineWidth = DOM.getElementPropertyInt(lineElement, "offsetWidth");
     int lineWidth = lineElement.getOffsetWidth();
-//    int knobWidth = DOM.getElementPropertyInt(knobElement, "offsetWidth");
     int knobWidth = knobElement.getOffsetWidth();
     int knobLeftOffset = (int) (lineLeftOffset + (getKnobPercent() * lineWidth) - (knobWidth / 2));
-    knobLeftOffset = Math.min(knobLeftOffset, lineLeftOffset + lineWidth
-        - (knobWidth / 2) - 1);
+    knobLeftOffset = Math.min(knobLeftOffset, lineLeftOffset + lineWidth - (knobWidth / 2) - 1);
     DOM.setStyleAttribute(knobElement, "left", knobLeftOffset + "px");
   }
 
@@ -816,7 +818,6 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
     }
 
     // Draw the labels
-//    int lineWidth = DOM.getElementPropertyInt(lineElement, "offsetWidth");
     int lineWidth = lineElement.getOffsetWidth();
     if (numLabels > 0) {
       // Create the labels or make them visible
@@ -831,8 +832,7 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
           if (enabled) {
             DOM.setElementProperty(label, "className", "gwt-SliderBar-label");
           } else {
-            DOM.setElementProperty(label, "className",
-                "gwt-SliderBar-label-disabled");
+            DOM.setElementProperty(label, "className", "gwt-SliderBar-label-disabled");
           }
           DOM.appendChild(getElement(), label);
           labelElements.add(label);
@@ -844,16 +844,14 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
         DOM.setStyleAttribute(label, "display", "");
         DOM.setElementProperty(label, "innerHTML", formatLabel(value));
 
-        // Move to the left so the label width is not clipped by the shell
+        // Move to the left so the label width is not clipped by the
+        // shell
         DOM.setStyleAttribute(label, "left", "0px");
 
         // Position the label and make it visible
-//        int labelWidth = DOM.getElementPropertyInt(label, "offsetWidth");
         int labelWidth = label.getOffsetWidth();
-        int labelLeftOffset = lineLeftOffset + (lineWidth * i / numLabels)
-            - (labelWidth / 2);
-        labelLeftOffset = Math.min(labelLeftOffset, lineLeftOffset + lineWidth
-            - labelWidth);
+        int labelLeftOffset = lineLeftOffset + (lineWidth * i / numLabels) - (labelWidth / 2);
+        labelLeftOffset = Math.min(labelLeftOffset, lineLeftOffset + lineWidth - labelWidth);
         labelLeftOffset = Math.max(labelLeftOffset, lineLeftOffset);
         DOM.setStyleAttribute(label, "left", labelLeftOffset + "px");
         DOM.setStyleAttribute(label, "visibility", "visible");
@@ -880,7 +878,6 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
     }
 
     // Draw the ticks
-//    int lineWidth = DOM.getElementPropertyInt(lineElement, "offsetWidth");
     int lineWidth = lineElement.getOffsetWidth();
     if (numTicks > 0) {
       // Create the ticks or make them visible
@@ -904,12 +901,9 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
         // Position the tick and make it visible
         DOM.setStyleAttribute(tick, "visibility", "hidden");
         DOM.setStyleAttribute(tick, "display", "");
-//        int tickWidth = DOM.getElementPropertyInt(tick, "offsetWidth");
         int tickWidth = tick.getOffsetWidth();
-        int tickLeftOffset = lineLeftOffset + (lineWidth * i / numTicks)
-            - (tickWidth / 2);
-        tickLeftOffset = Math.min(tickLeftOffset, lineLeftOffset + lineWidth
-            - tickWidth);
+        int tickLeftOffset = lineLeftOffset + (lineWidth * i / numTicks) - (tickWidth / 2);
+        tickLeftOffset = Math.min(tickLeftOffset, lineLeftOffset + lineWidth - tickWidth);
         DOM.setStyleAttribute(tick, "left", tickLeftOffset + "px");
         DOM.setStyleAttribute(tick, "visibility", "visible");
       }
@@ -930,8 +924,7 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
    */
   private void highlight() {
     String styleName = getStylePrimaryName();
-    DOM.setElementProperty(getElement(), "className", styleName + " "
-        + styleName + "-focused");
+    DOM.setElementProperty(getElement(), "className", styleName + " " + styleName + "-focused");
   }
 
   /**
@@ -950,9 +943,8 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
   private void slideKnob(Event event) {
     int x = DOM.eventGetClientX(event);
     if (x > 0) {
-//      int lineWidth = DOM.getElementPropertyInt(lineElement, "offsetWidth");
-    	int lineWidth = lineElement.getOffsetWidth();
-      int lineLeft = DOM.getAbsoluteLeft(lineElement);
+      int lineWidth = lineElement.getOffsetWidth();
+      int lineLeft = lineElement.getAbsoluteLeft();
       double percent = (double) (x - lineLeft) / lineWidth * 1.0;
       setCurrentValue(getTotalRange() * percent + minValue, true);
     }
@@ -984,8 +976,7 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
     if (unhighlight) {
       DOM.setElementProperty(lineElement, "className", "gwt-SliderBar-line");
 
-      DOM.setElementProperty(knobImage.getElement(), "className",
-          "gwt-SliderBar-knob");
+      DOM.setElementProperty(knobImage.getElement(), "className", "gwt-SliderBar-knob");
       knobImage.setResource(images.slider());
     }
   }
@@ -995,5 +986,10 @@ public class SliderBar extends FocusPanel implements ResizableWidget,
    */
   private void unhighlight() {
     DOM.setElementProperty(getElement(), "className", getStylePrimaryName());
+  }
+
+  @Override
+  public void onResize() {
+    redraw();
   }
 }
