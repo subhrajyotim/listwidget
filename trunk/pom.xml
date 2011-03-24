@@ -278,10 +278,11 @@
 					<hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
 					<server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
 					<copyWebapp>true</copyWebapp>
-					<!-- Keep duplicate JDT off classpath or module will not load -->
+					<!-- Keep duplicate JDT off classpath or module will not load 
 					<runClasspathExcludes>
 						<runClasspathExclude>jasper-jdt-6.0.29</runClasspathExclude>
 					</runClasspathExcludes>
+					-->
 				</configuration>
 				<executions>
 					<execution>
@@ -294,7 +295,7 @@
 				</executions>
 			</plugin>
 			<!-- Bundle server-side code only into single JAR to reduce # files transmitted -->
-			<!-- Still experimenting with this -->
+			<!-- Still experimenting with this 
 			<plugin>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>2.3.1</version>
@@ -354,6 +355,7 @@
 					</execution>
 				</executions>
 			</plugin>
+			-->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -429,21 +431,6 @@
 				<!-- Produce compressed JS during GWT compilation for production environment -->
 				<gwt.style>OBFUSCATED</gwt.style>
 			</properties>
-		</profile>
-
-		<profile>
-			<!-- Add Jasper as workaround to fix JSPs in dev mode with GAE 1.4.0 -->
-			<!-- This puts JDT CompilerOptions on the classpath which correctly -->
-			<!-- targets JDK 1.6 by default -->
-			<id>devmode</id>
-			<dependencies>
-				<dependency>
-					<groupId>org.apache.tomcat</groupId>
-					<artifactId>jasper</artifactId>
-					<version>6.0.29</version>
-					<scope>runtime</scope>
-				</dependency>
-			</dependencies>
 		</profile>
 	</profiles>
 
