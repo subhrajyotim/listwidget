@@ -20,7 +20,7 @@
 
 	<filter>
 		<filter-name>authFilter</filter-name>
-		<filter-class>com.listwidget.server.servlet.AuthFilter</filter-class>
+		<filter-class>com.turbomanage.listwidget.server.servlet.AuthFilter</filter-class>
 	</filter>
 
 	<filter-mapping>
@@ -52,7 +52,7 @@
 	<!-- Servlets -->
 	<servlet>
 		<servlet-name>requestFactoryServlet</servlet-name>
-		<servlet-class>com.listwidget.server.servlet.BugFixRequestFactoryServlet</servlet-class>
+		<servlet-class>com.turbomanage.listwidget.server.servlet.BugFixRequestFactoryServlet</servlet-class>
 		<init-param>
 			<param-name>symbolMapsDirectory</param-name>
 			<!-- You'll need to compile with -extras and move the symbolMaps directory 
