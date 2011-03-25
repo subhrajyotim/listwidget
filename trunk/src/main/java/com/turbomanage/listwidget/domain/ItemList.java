@@ -10,6 +10,10 @@ import com.googlecode.objectify.annotation.Entity;
 import com.turbomanage.listwidget.server.service.AppUserDao;
 import com.turbomanage.listwidget.shared.proxy.ItemListProxy.ListType;
 
+/**
+ * POJO that represents a list of items such as a ToDo list.
+ * The items are stored as an embedded object.
+ */
 @Entity
 public class ItemList extends DatastoreObject
 {

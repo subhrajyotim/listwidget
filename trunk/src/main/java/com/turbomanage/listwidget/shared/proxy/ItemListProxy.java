@@ -9,7 +9,7 @@ import com.turbomanage.listwidget.server.locator.ObjectifyLocator;
 @ProxyFor(value = ItemList.class, locator = ObjectifyLocator.class)
 public interface ItemListProxy extends DatastoreObjectProxy
 {
-	// TODO enums work!
+	// Note: enums work!
 	public enum ListType {NOTES, TODO}
 
 	String getName();

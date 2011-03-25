@@ -9,6 +9,9 @@ public class DatastoreObject
 	private Long id;
 	private Integer version = 0;
 	
+	/**
+	 * Auto-increment version # whenever persisted
+	 */
 	@PrePersist
 	void onPersist()
 	{
