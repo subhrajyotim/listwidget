@@ -6,12 +6,9 @@ import com.turbomanage.listwidget.domain.DatastoreObject;
 
 /**
  * Generic @Locator for objects that extend DatastoreObject
- * 
- * @author turbomanage
  */
 public class ObjectifyLocator extends Locator<DatastoreObject	, Long>
 {
-
 	@Override
 	public DatastoreObject create(Class<? extends DatastoreObject> clazz)
 	{
@@ -20,14 +17,11 @@ public class ObjectifyLocator extends Locator<DatastoreObject	, Long>
 			return clazz.newInstance();
 		} catch (InstantiationException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		  throw new RuntimeException(e);
 		} catch (IllegalAccessException e)
 		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		}
-		return null;
 	}
 
 	@Override
@@ -61,5 +55,4 @@ public class ObjectifyLocator extends Locator<DatastoreObject	, Long>
 	{
 		return domainObject.getVersion();
 	}
-
 }

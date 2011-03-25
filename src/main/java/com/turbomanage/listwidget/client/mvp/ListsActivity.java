@@ -93,7 +93,6 @@ public class ListsActivity extends AbstractActivity implements Activity,
 		display.getNameColumn().setFieldUpdater(new NameFieldUpdater());
 	}
 
-	@Override
 	public void persistList(String listName)
 	{
 		final ListwidgetRequestFactory rf = this.clientFactory

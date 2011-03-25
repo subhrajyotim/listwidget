@@ -3,6 +3,9 @@ package com.turbomanage.listwidget.domain;
 import java.util.Date;
 
 
+/**
+ * POJO that represents an item in a list.
+ */
 public class ListItem // POJO
 {
 	private String itemText;

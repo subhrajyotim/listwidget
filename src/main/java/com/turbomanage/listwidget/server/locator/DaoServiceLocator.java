@@ -12,7 +12,6 @@ public class DaoServiceLocator implements ServiceLocator {
 
 	@Override
 	public Object getInstance(Class<?> clazz) {
-		System.out.println(clazz);
 		try {
 			return clazz.newInstance();
 		} catch (InstantiationException e) {

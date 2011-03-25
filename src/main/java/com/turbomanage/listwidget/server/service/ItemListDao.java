@@ -2,16 +2,12 @@ package com.turbomanage.listwidget.server.service;
 
 import java.util.List;
 
-import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.gwt.requestfactory.server.RequestFactoryServlet;
 import com.googlecode.objectify.Key;
-import com.googlecode.objectify.Query;
 import com.turbomanage.listwidget.domain.AppUser;
 import com.turbomanage.listwidget.domain.ItemList;
 
 /**
- * @author drfibonacci
- *
+ * @author turbomanage
  */
 public class ItemListDao extends ObjectifyDao<ItemList>
 {
@@ -33,7 +29,6 @@ public class ItemListDao extends ObjectifyDao<ItemList>
 		this.put(list);
 	}
 
-	// Note: requires no args since it's an instance method
 	public ItemList saveAndReturn(ItemList list)
 	{
 		AppUser loggedInUser = LoginService.getLoggedInUser();

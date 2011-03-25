@@ -12,7 +12,6 @@ import com.turbomanage.listwidget.shared.proxy.ItemListProxy;
 
 public interface ListwidgetRequestFactory extends RequestFactory
 {
-
 	/**
 	 * Service stub for methods in ItemListDao
 	 * 
@@ -29,5 +28,4 @@ public interface ListwidgetRequestFactory extends RequestFactory
 	}
 	
 	ItemListRequestContext itemListRequest();
-
 }
