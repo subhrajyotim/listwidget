@@ -11,7 +11,7 @@
 		<gwt.version>2.2.0</gwt.version>
 		<!-- Default style during dev -->
 		<gwt.style>PRETTY</gwt.style>
-		<gae.version>1.4.2</gae.version>
+		<gae.version>1.4.3</gae.version>
 		<gae.home>${user.home}/.m2/repository/com/google/appengine/appengine-java-sdk/${gae.version}/appengine-java-sdk-${gae.version}</gae.home>
 		<gae.application.version>1</gae.application.version>
 	</properties>
