@@ -4,15 +4,15 @@ import java.util.List;
 
 import com.googlecode.objectify.Key;
 import com.turbomanage.listwidget.domain.AppUser;
-import com.turbomanage.listwidget.domain.ItemList;
+import com.turbomanage.listwidget.domain.NamedList;
 
 /**
  * @author turbomanage
  */
-public class ItemListDao extends ObjectifyDao<ItemList>
+public class ItemListDao extends ObjectifyDao<NamedList>
 {
 	@Override
-	public List<ItemList> listAll()
+	public List<NamedList> listAll()
 	{
 		return this.listAllForUser();
 	}
@@ -22,18 +22,18 @@ public class ItemListDao extends ObjectifyDao<ItemList>
 	 * 
 	 * @param obj
 	 */
-	public void save(ItemList list)
+	public void save(NamedList list)
 	{
 		AppUser loggedInUser = LoginService.getLoggedInUser();
 		list.setOwner(loggedInUser);
 		this.put(list);
 	}
 
-	public ItemList saveAndReturn(ItemList list)
+	public NamedList saveAndReturn(NamedList list)
 	{
 		AppUser loggedInUser = LoginService.getLoggedInUser();
 		list.setOwner(loggedInUser);
-		Key<ItemList> key = this.put(list);
+		Key<NamedList> key = this.put(list);
 		try
 		{
 			return this.get(key);
@@ -49,7 +49,7 @@ public class ItemListDao extends ObjectifyDao<ItemList>
 	 * 
 	 * @param list
 	 */
-	public void removeList(ItemList list)
+	public void removeList(NamedList list)
 	{
 		this.delete(list);
 	}

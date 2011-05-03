@@ -17,8 +17,8 @@ import com.turbomanage.listwidget.client.event.MessageEvent;
 import com.turbomanage.listwidget.client.ui.ListsView;
 import com.turbomanage.listwidget.client.ui.ListsView.Presenter;
 import com.turbomanage.listwidget.client.ui.widget.MessageWidget.MessageType;
-import com.turbomanage.listwidget.shared.proxy.ItemListProxy;
-import com.turbomanage.listwidget.shared.proxy.ItemListProxy.ListType;
+import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
+import com.turbomanage.listwidget.shared.proxy.NamedListProxy.ListType;
 import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory;
 import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory.ItemListRequestContext;
 
@@ -37,7 +37,7 @@ public class ListsActivity extends AbstractActivity implements Activity,
 	private EventBus eventBus;
 
 	public static class ListDataProvider extends
-			AsyncDataProvider<ItemListProxy>
+			AsyncDataProvider<NamedListProxy>
 	{
 		private Logger logger = Logger
 				.getLogger(ListsActivity.ListDataProvider.class.getName());
@@ -49,7 +49,7 @@ public class ListsActivity extends AbstractActivity implements Activity,
 		}
 
 		@Override
-		protected void onRangeChanged(HasData<ItemListProxy> display)
+		protected void onRangeChanged(HasData<NamedListProxy> display)
 		{
 			getData();
 		}
@@ -58,13 +58,13 @@ public class ListsActivity extends AbstractActivity implements Activity,
 		{
 			logger.warning("getting data");
 			// To retrieve relations and value types, use .with()
-			Request<List<ItemListProxy>> findAllReq = rf.itemListRequest()
+			Request<List<NamedListProxy>> findAllReq = rf.itemListRequest()
 					.listAll().with("owner");
 			// Receiver specifies return type
-			findAllReq.fire(new Receiver<List<ItemListProxy>>()
+			findAllReq.fire(new Receiver<List<NamedListProxy>>()
 			{
 				@Override
-				public void onSuccess(List<ItemListProxy> response)
+				public void onSuccess(List<NamedListProxy> response)
 				{
 					updateRowCount(response.size(), true);
 					updateRowData(0, response);
@@ -98,13 +98,13 @@ public class ListsActivity extends AbstractActivity implements Activity,
 		final ListwidgetRequestFactory rf = this.clientFactory
 				.getRequestFactory();
 		ItemListRequestContext reqCtx = rf.itemListRequest();
-		final ItemListProxy newList = reqCtx.create(ItemListProxy.class);
+		final NamedListProxy newList = reqCtx.create(NamedListProxy.class);
 		newList.setName(listName);
 		newList.setListType(ListType.TODO);
-		reqCtx.saveAndReturn(newList).fire(new Receiver<ItemListProxy>()
+		reqCtx.saveAndReturn(newList).fire(new Receiver<NamedListProxy>()
 		{
 			@Override
-			public void onSuccess(final ItemListProxy savedList)
+			public void onSuccess(final NamedListProxy savedList)
 			{
 				// Refresh table
 				listDataProvider.getData();
@@ -126,14 +126,14 @@ public class ListsActivity extends AbstractActivity implements Activity,
 	 * @author David Chandler
 	 */
 	public class NameFieldUpdater implements
-			FieldUpdater<ItemListProxy, String>
+			FieldUpdater<NamedListProxy, String>
 	{
 		@Override
-		public void update(int index, ItemListProxy obj, final String newName)
+		public void update(int index, NamedListProxy obj, final String newName)
 		{
 			ItemListRequestContext reqCtx = clientFactory.getRequestFactory()
 					.itemListRequest();
-			ItemListProxy editable = reqCtx.edit(obj);
+			NamedListProxy editable = reqCtx.edit(obj);
 			editable.setName(newName);
 			reqCtx.save(editable).fire(new Receiver<Void>()
 			{
@@ -148,7 +148,7 @@ public class ListsActivity extends AbstractActivity implements Activity,
 	}
 
 	@Override
-	public void removeList(ItemListProxy list)
+	public void removeList(NamedListProxy list)
 	{
 		ItemListRequestContext reqCtx = clientFactory.getRequestFactory().itemListRequest();
 		reqCtx.removeList(list).fire(new Receiver<Void>()

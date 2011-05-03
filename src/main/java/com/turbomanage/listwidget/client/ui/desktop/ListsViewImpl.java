@@ -22,7 +22,7 @@ import com.turbomanage.listwidget.client.mvp.EditListPlace;
 import com.turbomanage.listwidget.client.ui.ListsView;
 import com.turbomanage.listwidget.client.ui.widget.HyperlinkCell;
 import com.turbomanage.listwidget.client.ui.widget.MessageWidget;
-import com.turbomanage.listwidget.shared.proxy.ItemListProxy;
+import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
 
 public class ListsViewImpl extends Composite implements ListsView
 {
@@ -30,8 +30,8 @@ public class ListsViewImpl extends Composite implements ListsView
 	TextBox newListName = new TextBox();
 	private Presenter presenter;
 	private ClientFactory clientFactory;
-	private CellTable<ItemListProxy> cellTable = new CellTable<ItemListProxy>();
-	private Column<ItemListProxy, String> nameColumn;
+	private CellTable<NamedListProxy> cellTable = new CellTable<NamedListProxy>();
+	private Column<NamedListProxy, String> nameColumn;
 
 	public ListsViewImpl()
 	{
@@ -48,10 +48,10 @@ public class ListsViewImpl extends Composite implements ListsView
 		initWidget(vPanel);
 		
 		// Note Flyweight pattern: only one instance of HyperlinkCell passed to the Column
-		Column<ItemListProxy, Hyperlink> linkColumn = new Column<ItemListProxy, Hyperlink>(new HyperlinkCell())
+		Column<NamedListProxy, Hyperlink> linkColumn = new Column<NamedListProxy, Hyperlink>(new HyperlinkCell())
 		{
 			@Override
-			public Hyperlink getValue(ItemListProxy list)
+			public Hyperlink getValue(NamedListProxy list)
 			{
 				String proxyToken = clientFactory.getRequestFactory().getHistoryToken(list.stableId());
 				String historyToken = clientFactory.getHistoryMapper().getToken(new EditListPlace(proxyToken));
@@ -61,35 +61,35 @@ public class ListsViewImpl extends Composite implements ListsView
 		};
 		
 		// Editable column for list name
-		nameColumn = new Column<ItemListProxy,String>(new EditTextCell())
+		nameColumn = new Column<NamedListProxy,String>(new EditTextCell())
 		{
 			@Override
-			public String getValue(ItemListProxy list)
+			public String getValue(NamedListProxy list)
 			{
 				return list.getName();
 			}
 		};
 
-		ActionCell<ItemListProxy> actionCell = new ActionCell<ItemListProxy>("Del",new Delegate<ItemListProxy>()
+		ActionCell<NamedListProxy> actionCell = new ActionCell<NamedListProxy>("Del",new Delegate<NamedListProxy>()
 		{
 			@Override
-			public void execute(ItemListProxy object)
+			public void execute(NamedListProxy object)
 			{
 				presenter.removeList(object);
 			}
 		});
-		Column<ItemListProxy, ItemListProxy> delColumn = new Column<ItemListProxy, ItemListProxy>(actionCell)
+		Column<NamedListProxy, NamedListProxy> delColumn = new Column<NamedListProxy, NamedListProxy>(actionCell)
 		{
 			@Override
-			public ItemListProxy getValue(ItemListProxy object)
+			public NamedListProxy getValue(NamedListProxy object)
 			{
 				return object;
 			}
 		};
-//		Column<ItemListProxy, Anchor> delColumn = new Column<ItemListProxy, Anchor>(new AnchorCell())
+//		Column<NamedListProxy, Anchor> delColumn = new Column<NamedListProxy, Anchor>(new AnchorCell())
 //		{
 //			@Override
-//			public Anchor getValue(final ItemListProxy list)
+//			public Anchor getValue(final NamedListProxy list)
 //			{
 //				Anchor a = new Anchor("Del");
 //				a.addClickHandler(new ClickHandler()
@@ -106,9 +106,9 @@ public class ListsViewImpl extends Composite implements ListsView
 //		};
 
 		// Display-only column showing owner email
-		TextColumn<ItemListProxy> ownerColumn = new TextColumn<ItemListProxy>() {
+		TextColumn<NamedListProxy> ownerColumn = new TextColumn<NamedListProxy>() {
 			@Override
-			public String getValue(ItemListProxy list) {
+			public String getValue(NamedListProxy list) {
 				return list.getOwner().getEmail();
 			}
 		};
@@ -153,13 +153,13 @@ public class ListsViewImpl extends Composite implements ListsView
 	}
 
 	@Override
-	public HasData<ItemListProxy> getDataTable()
+	public HasData<NamedListProxy> getDataTable()
 	{
 		return cellTable;
 	}
 
 	@Override
-	public Column<ItemListProxy, String> getNameColumn()
+	public Column<NamedListProxy, String> getNameColumn()
 	{
 		return nameColumn;
 	}

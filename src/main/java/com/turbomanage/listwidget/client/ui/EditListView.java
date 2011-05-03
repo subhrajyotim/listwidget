@@ -1,14 +1,10 @@
 package com.turbomanage.listwidget.client.ui;
 
-import java.util.Date;
-import java.util.List;
-
 import com.google.gwt.user.cellview.client.Column;
 import com.google.gwt.user.client.ui.HasValue;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.view.client.HasData;
 import com.turbomanage.listwidget.shared.proxy.ListItemProxy;
-import com.turbomanage.listwidget.shared.proxy.ItemListProxy.ListType;
 
 public interface EditListView extends IsWidget
 {

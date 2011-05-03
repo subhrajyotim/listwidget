@@ -6,11 +6,11 @@ import java.util.Date;
 /**
  * POJO that represents an item in a list.
  */
-public class ListItem // POJO
+public class ListItem
 {
 	private String itemText;
 	private Date dateCreated;
-	
+	// Getters and setters
 	public Date getDateCreated()
 	{
 		return dateCreated;
@@ -61,12 +61,12 @@ public class ListItem // POJO
 //		this.version = version;
 //	}
 //
-//	public void setParent(ItemList parent)
+//	public void setParent(NamedList parent)
 //	{
 //		this.parentKey = new ItemListDao().key(parent);
 //	}
 //
-//	public ItemList getParent()
+//	public NamedList getParent()
 //	{
 //		try
 //		{

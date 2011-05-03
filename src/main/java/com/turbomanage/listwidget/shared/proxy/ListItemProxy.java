@@ -11,7 +11,7 @@ import com.turbomanage.listwidget.domain.ListItem;
  *
  * @author turbomanage
  */
-@ProxyFor(value = ListItem.class)
+@ProxyFor(ListItem.class)
 public interface ListItemProxy extends ValueProxy
 {
 	String getItemText();

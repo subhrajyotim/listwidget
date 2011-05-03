@@ -8,7 +8,7 @@ import com.google.gwt.requestfactory.shared.RequestFactory;
 import com.google.gwt.requestfactory.shared.Service;
 import com.turbomanage.listwidget.server.locator.DaoServiceLocator;
 import com.turbomanage.listwidget.server.service.ItemListDao;
-import com.turbomanage.listwidget.shared.proxy.ItemListProxy;
+import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
 
 public interface ListwidgetRequestFactory extends RequestFactory
 {
@@ -21,10 +21,10 @@ public interface ListwidgetRequestFactory extends RequestFactory
 	@Service(value = ItemListDao.class, locator = DaoServiceLocator.class)
 	interface ItemListRequestContext extends RequestContext
 	{
-		Request<List<ItemListProxy>> listAll();
-		Request<Void> save(ItemListProxy list);
-		Request<ItemListProxy> saveAndReturn(ItemListProxy newList);
-		Request<Void> removeList(ItemListProxy list);
+		Request<List<NamedListProxy>> listAll();
+		Request<Void> save(NamedListProxy list);
+		Request<NamedListProxy> saveAndReturn(NamedListProxy newList);
+		Request<Void> removeList(NamedListProxy list);
 	}
 	
 	ItemListRequestContext itemListRequest();
