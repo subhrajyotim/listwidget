@@ -18,7 +18,7 @@ import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Query;
 import com.googlecode.objectify.helper.DAOBase;
 import com.turbomanage.listwidget.domain.AppUser;
-import com.turbomanage.listwidget.domain.ItemList;
+import com.turbomanage.listwidget.domain.NamedList;
 import com.turbomanage.listwidget.shared.TooManyResultsException;
 
 /**
@@ -36,7 +36,7 @@ public class ObjectifyDao<T> extends DAOBase
 
 	static
 	{
-		ObjectifyService.register(ItemList.class);
+		ObjectifyService.register(NamedList.class);
 		ObjectifyService.register(AppUser.class);
 	}
 

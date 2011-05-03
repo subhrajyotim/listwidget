@@ -2,6 +2,7 @@ package com.turbomanage.listwidget.client.mvp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -12,6 +13,8 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.requestfactory.shared.EntityProxyId;
 import com.google.gwt.requestfactory.shared.Receiver;
 import com.google.gwt.requestfactory.shared.Request;
+import com.google.gwt.requestfactory.shared.Violation;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.ListDataProvider;
 import com.turbomanage.listwidget.client.ClientFactory;
@@ -20,7 +23,7 @@ import com.turbomanage.listwidget.client.ui.EditListView;
 import com.turbomanage.listwidget.client.ui.EditListView.Presenter;
 import com.turbomanage.listwidget.client.ui.desktop.EditListViewImpl;
 import com.turbomanage.listwidget.client.ui.widget.MessageWidget.MessageType;
-import com.turbomanage.listwidget.shared.proxy.ItemListProxy;
+import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
 import com.turbomanage.listwidget.shared.proxy.ListItemProxy;
 import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory;
 import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory.ItemListRequestContext;
@@ -29,8 +32,8 @@ public class EditListActivity extends AbstractActivity implements Presenter
 {
 	private Logger logger = Logger.getLogger(EditListActivity.class.getName());
 	private ClientFactory clientFactory;
-	private EntityProxyId<ItemListProxy> itemListId;
-	private ItemListProxy editList;
+	private EntityProxyId<NamedListProxy> itemListId;
+	private NamedListProxy editList;
 	private EditListView view;
 	private String itemListToken;
 	private ListDataProvider<ListItemProxy> itemsProvider;
@@ -48,17 +51,17 @@ public class EditListActivity extends AbstractActivity implements Presenter
 		this.eventBus = eventBus;
 		// Find the entity proxy
 		final ListwidgetRequestFactory req = clientFactory.getRequestFactory();
-		EntityProxyId<ItemListProxy> proxyId = req
+		EntityProxyId<NamedListProxy> proxyId = req
 				.getProxyId(this.itemListToken);
 		this.itemListId = proxyId;
 		// .with("items") required to retrieve relations
-		Request<ItemListProxy> findReq = clientFactory.getRequestFactory()
+		Request<NamedListProxy> findReq = clientFactory.getRequestFactory()
 				.find(itemListId).with("items");
 		view = clientFactory.getEditListView();
-		findReq.fire(new Receiver<ItemListProxy>()
+		findReq.fire(new Receiver<NamedListProxy>()
 		{
 			@Override
-			public void onSuccess(ItemListProxy itemList)
+			public void onSuccess(NamedListProxy itemList)
 			{
 				// Gotcha--if do this, must call panel.setWidget in onSuccess
 				// also
@@ -103,7 +106,7 @@ public class EditListActivity extends AbstractActivity implements Presenter
 			@Override
 			public void onSuccess(Void response)
 			{
-				logger.info("updating itesm");
+				logger.info("updating items");
 				itemsProvider.setList(editList.getItems());
 				itemsProvider.refresh();
 			}
