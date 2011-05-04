@@ -63,14 +63,14 @@ public class ListItem
 //
 //	public void setParent(NamedList parent)
 //	{
-//		this.parentKey = new ItemListDao().key(parent);
+//		this.parentKey = new NamedListDao().key(parent);
 //	}
 //
 //	public NamedList getParent()
 //	{
 //		try
 //		{
-//			return new ItemListDao().get(parentKey);
+//			return new NamedListDao().get(parentKey);
 //		}
 //		catch (EntityNotFoundException e)
 //		{

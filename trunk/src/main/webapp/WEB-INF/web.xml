@@ -28,31 +28,10 @@
 		<servlet-name>requestFactoryServlet</servlet-name>
 	</filter-mapping>
 
-	<!-- Alternate workaround for JDT compilation problem in dev mode on GAE 
-	<servlet>
-		<servlet-name>jsp</servlet-name>
-		<servlet-class>com.google.appengine.tools.development.PrivilegedJspServlet</servlet-class>
-		<init-param>
-			<param-name>compilerSourceVM</param-name>
-			<param-value>1.6</param-value>
-		</init-param>
-		<init-param>
-			<param-name>compilerTargetVM</param-name>
-			<param-value>1.6</param-value>
-		</init-param>
-		<load-on-startup>3</load-on-startup>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>jsp</servlet-name>
-		<url-pattern>*.jsp</url-pattern>
-	</servlet-mapping>
-	-->
-
-
 	<!-- Servlets -->
 	<servlet>
 		<servlet-name>requestFactoryServlet</servlet-name>
-		<servlet-class>com.turbomanage.listwidget.server.servlet.BugFixRequestFactoryServlet</servlet-class>
+		<servlet-class>com.google.gwt.requestfactory.server.RequestFactoryServlet</servlet-class>
 		<init-param>
 			<param-name>symbolMapsDirectory</param-name>
 			<!-- You'll need to compile with -extras and move the symbolMaps directory 

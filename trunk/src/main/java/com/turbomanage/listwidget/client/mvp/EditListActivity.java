@@ -2,29 +2,23 @@ package com.turbomanage.listwidget.client.mvp;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.cell.client.FieldUpdater;
-import com.google.gwt.event.logical.shared.ValueChangeEvent;
-import com.google.gwt.event.logical.shared.ValueChangeHandler;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.requestfactory.shared.EntityProxyId;
 import com.google.gwt.requestfactory.shared.Receiver;
 import com.google.gwt.requestfactory.shared.Request;
-import com.google.gwt.requestfactory.shared.Violation;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.view.client.ListDataProvider;
 import com.turbomanage.listwidget.client.ClientFactory;
 import com.turbomanage.listwidget.client.event.MessageEvent;
 import com.turbomanage.listwidget.client.ui.EditListView;
 import com.turbomanage.listwidget.client.ui.EditListView.Presenter;
-import com.turbomanage.listwidget.client.ui.desktop.EditListViewImpl;
 import com.turbomanage.listwidget.client.ui.widget.MessageWidget.MessageType;
-import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
 import com.turbomanage.listwidget.shared.proxy.ListItemProxy;
+import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
 import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory;
 import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory.ItemListRequestContext;
 

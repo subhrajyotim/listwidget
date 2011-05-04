@@ -10,9 +10,6 @@ import com.turbomanage.listwidget.server.locator.ObjectifyLocator;
 @ProxyFor(value = NamedList.class, locator = ObjectifyLocator.class)
 public interface NamedListProxy extends EntityProxy
 {
-	// Note: enums work!
-	public enum ListType {NOTES, TODO}
-
 	String getName();
 	void setName(String name);
 	List<ListItemProxy> getItems();

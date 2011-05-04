@@ -7,18 +7,15 @@ import com.google.gwt.requestfactory.shared.RequestContext;
 import com.google.gwt.requestfactory.shared.RequestFactory;
 import com.google.gwt.requestfactory.shared.Service;
 import com.turbomanage.listwidget.server.locator.DaoServiceLocator;
-import com.turbomanage.listwidget.server.service.ItemListDao;
+import com.turbomanage.listwidget.server.service.NamedListDao;
 import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
 
 public interface ListwidgetRequestFactory extends RequestFactory
 {
 	/**
-	 * Service stub for methods in ItemListDao
-	 * 
-	 * TODO Enhance RequestFactory to enable service stubs to extend a base interface
-	 * so we don't have to repeat methods from the base ObjectifyDao in each stub
+	 * Service stub for methods in NamedListDao
 	 */
-	@Service(value = ItemListDao.class, locator = DaoServiceLocator.class)
+	@Service(value = NamedListDao.class, locator = DaoServiceLocator.class)
 	interface ItemListRequestContext extends RequestContext
 	{
 		Request<List<NamedListProxy>> listAll();
@@ -26,6 +23,7 @@ public interface ListwidgetRequestFactory extends RequestFactory
 		Request<NamedListProxy> saveAndReturn(NamedListProxy newList);
 		Request<Void> removeList(NamedListProxy list);
 	}
-	
+
+	// Service stub accessor
 	ItemListRequestContext itemListRequest();
 }

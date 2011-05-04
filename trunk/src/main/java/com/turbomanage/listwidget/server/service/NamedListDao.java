@@ -9,7 +9,7 @@ import com.turbomanage.listwidget.domain.NamedList;
 /**
  * @author turbomanage
  */
-public class ItemListDao extends ObjectifyDao<NamedList>
+public class NamedListDao extends ObjectifyDao<NamedList>
 {
 	@Override
 	public List<NamedList> listAll()
