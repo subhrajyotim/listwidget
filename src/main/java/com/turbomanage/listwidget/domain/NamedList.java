@@ -3,14 +3,12 @@ package com.turbomanage.listwidget.domain;
 import java.util.List;
 
 import javax.persistence.Embedded;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
 
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.annotation.Entity;
 import com.turbomanage.listwidget.server.service.AppUserDao;
-import com.turbomanage.listwidget.shared.proxy.NamedListProxy.ListType;
+import com.turbomanage.listwidget.shared.proxy.ListType;
 
 /**
  * POJO that represents a list of items such as a ToDo list.
