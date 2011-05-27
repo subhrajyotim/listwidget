@@ -8,7 +8,6 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.requestfactory.shared.EntityProxyId;
 import com.google.gwt.requestfactory.shared.Receiver;
 import com.google.gwt.requestfactory.shared.Request;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -23,7 +22,7 @@ import com.turbomanage.listwidget.shared.proxy.ListItemProxy;
 import com.turbomanage.listwidget.shared.proxy.ListType;
 import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
 import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory;
-import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory.ItemListRequestContext;
+import com.turbomanage.listwidget.shared.service.NamedListService;
 
 /**
  * Shows all lists available
@@ -33,11 +32,23 @@ import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory.ItemLi
 public class ListsActivity extends AbstractActivity implements Activity,
 		Presenter
 {
-	private Logger logger = Logger.getLogger(ListsActivity.class.getName());
+	@Override
+  public String mayStop() {
+    return null;//"Please hold on. This activity may be stopping";
+  }
+
+  @Override
+  public void onStop() {
+    // TODO Auto-generated method stub
+    super.onStop();
+  }
+
+  private Logger logger = Logger.getLogger(ListsActivity.class.getName());
 	private ClientFactory clientFactory;
 	private ListsView display;
 	private ListDataProvider listDataProvider;
 	private EventBus eventBus;
+  private ListwidgetRequestFactory myRF;
 
 	public static class ListDataProvider extends
 			AsyncDataProvider<NamedListProxy>
@@ -61,7 +72,7 @@ public class ListsActivity extends AbstractActivity implements Activity,
 		{
 			logger.warning("getting data");
 			// To retrieve relations and value types, use .with()
-			Request<List<NamedListProxy>> findAllReq = rf.itemListRequest()
+			Request<List<NamedListProxy>> findAllReq = rf.namedListService()
 					.listAll().with("owner");
 			// Receiver specifies return type
 			findAllReq.fire(new Receiver<List<NamedListProxy>>()
@@ -79,8 +90,8 @@ public class ListsActivity extends AbstractActivity implements Activity,
 	public ListsActivity(ClientFactory cf)
 	{
 		this.clientFactory = cf;
-		this.listDataProvider = new ListDataProvider(
-				clientFactory.getRequestFactory());
+		this.myRF = clientFactory.getRequestFactory();
+		this.listDataProvider = new ListDataProvider(this.myRF);
 	}
 
 	@Override
@@ -98,9 +109,7 @@ public class ListsActivity extends AbstractActivity implements Activity,
 
 	public void persistList(String listName)
 	{
-		final ListwidgetRequestFactory rf = this.clientFactory
-				.getRequestFactory();
-		ItemListRequestContext reqCtx = rf.itemListRequest();
+		NamedListService reqCtx = myRF.namedListService();
 		NamedListProxy newList = reqCtx.create(NamedListProxy.class);
 		newList.setName(listName);
 		newList.setItems(new ArrayList<ListItemProxy>());
@@ -133,8 +142,7 @@ public class ListsActivity extends AbstractActivity implements Activity,
 		@Override
 		public void update(int index, NamedListProxy obj, final String newName)
 		{
-			ItemListRequestContext reqCtx = clientFactory.getRequestFactory()
-					.itemListRequest();
+			NamedListService reqCtx = myRF.namedListService();
 			NamedListProxy editable = reqCtx.edit(obj);
 			editable.setName(newName);
 			reqCtx.save(editable).fire(new Receiver<Void>()
@@ -142,6 +150,7 @@ public class ListsActivity extends AbstractActivity implements Activity,
 				@Override
 				public void onSuccess(Void response)
 				{
+				  // Update status message
 					eventBus.fireEvent(new MessageEvent(newName + " updated",
 							MessageType.INFO));
 				}
@@ -152,7 +161,7 @@ public class ListsActivity extends AbstractActivity implements Activity,
 	@Override
 	public void removeList(NamedListProxy list)
 	{
-		ItemListRequestContext reqCtx = clientFactory.getRequestFactory().itemListRequest();
+		NamedListService reqCtx = clientFactory.getRequestFactory().namedListService();
 		reqCtx.removeList(list).fire(new Receiver<Void>()
 		{
 			@Override
