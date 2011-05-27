@@ -7,11 +7,11 @@ import java.util.logging.Logger;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.view.client.ListDataProvider;
 import com.google.gwt.requestfactory.shared.EntityProxyId;
 import com.google.gwt.requestfactory.shared.Receiver;
 import com.google.gwt.requestfactory.shared.Request;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.view.client.ListDataProvider;
 import com.turbomanage.listwidget.client.ClientFactory;
 import com.turbomanage.listwidget.client.event.MessageEvent;
 import com.turbomanage.listwidget.client.ui.EditListView;
@@ -20,7 +20,7 @@ import com.turbomanage.listwidget.client.ui.widget.MessageWidget.MessageType;
 import com.turbomanage.listwidget.shared.proxy.ListItemProxy;
 import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
 import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory;
-import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory.ItemListRequestContext;
+import com.turbomanage.listwidget.shared.service.NamedListService;
 
 public class EditListActivity extends AbstractActivity implements Presenter
 {
@@ -39,7 +39,7 @@ public class EditListActivity extends AbstractActivity implements Presenter
 		this.itemListToken = editListPlace.getToken();
 	}
 
-	@Override
+  @Override
 	public void start(final AcceptsOneWidget panel, EventBus eventBus)
 	{
 		this.eventBus = eventBus;
@@ -82,8 +82,8 @@ public class EditListActivity extends AbstractActivity implements Presenter
 	public void addItem(String itemText)
 	{
 		logger.info("persisting new listitem");
-		ItemListRequestContext reqCtx = clientFactory.getRequestFactory()
-				.itemListRequest();
+		NamedListService reqCtx = clientFactory.getRequestFactory()
+				.namedListService();
 		ListItemProxy newItem = reqCtx.create(ListItemProxy.class);
 		newItem.setItemText(itemText);
 		// Required?
@@ -112,8 +112,8 @@ public class EditListActivity extends AbstractActivity implements Presenter
 		@Override
 		public void update(int index, ListItemProxy item, final String newText)
 		{
-			ItemListRequestContext reqCtx = clientFactory.getRequestFactory()
-					.itemListRequest();
+			NamedListService reqCtx = clientFactory.getRequestFactory()
+					.namedListService();
 			ListItemProxy editItem = reqCtx.edit(item);
 			editItem.setItemText(newText);
 			editList = reqCtx.edit(editList);
@@ -134,8 +134,8 @@ public class EditListActivity extends AbstractActivity implements Presenter
 	@Override
 	public void updateListName(String newName)
 	{
-		ItemListRequestContext reqCtx = clientFactory.getRequestFactory()
-				.itemListRequest();
+		NamedListService reqCtx = clientFactory.getRequestFactory()
+				.namedListService();
 		editList = reqCtx.edit(editList);
 		editList.setName(newName);
 		reqCtx.save(editList).fire(new Receiver<Void>()
