@@ -69,7 +69,8 @@
 			<artifactId>appengine-api-labs</artifactId>
 			<version>${gae.version}</version>
 		</dependency>
-		<!-- next 2 for GAE unit testing, run mvn package first if problems -->
+		<!-- uncomment next 2 to write GAE unit tests, run mvn package first to expand appengine-java-sdk -->
+		<!-- 
 		<dependency>
 			<groupId>com.google.appengine</groupId>
 			<artifactId>appengine-local-runtime</artifactId>
@@ -84,6 +85,7 @@
 			<scope>system</scope>
 			<systemPath>${gae.home}/lib/appengine-tools-api.jar</systemPath>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
