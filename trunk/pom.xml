@@ -69,12 +69,21 @@
 			<artifactId>appengine-api-labs</artifactId>
 			<version>${gae.version}</version>
 		</dependency>
-		<!-- uncomment for testing <dependency> <groupId>com.google.appengine</groupId> 
-			<artifactId>appengine-local-runtime</artifactId> <version>${gae.version}</version> 
-			<scope>system</scope> <systemPath>${gae.home}/lib/impl/appengine-local-runtime.jar</systemPath> 
-			</dependency> <dependency> <groupId>com.google.appengine</groupId> <artifactId>appengine-tools-api</artifactId> 
-			<version>${gae.version}</version> <scope>system</scope> <systemPath>${gae.home}/lib/appengine-tools-api.jar</systemPath> 
-			</dependency> -->
+		<!-- next 2 for GAE unit testing, run mvn package first if problems -->
+		<dependency>
+			<groupId>com.google.appengine</groupId>
+			<artifactId>appengine-local-runtime</artifactId>
+			<version>${gae.version}</version>
+			<scope>system</scope>
+			<systemPath>${gae.home}/lib/impl/appengine-local-runtime.jar</systemPath>
+		</dependency>
+		<dependency>
+			<groupId>com.google.appengine</groupId>
+			<artifactId>appengine-tools-api</artifactId>
+			<version>${gae.version}</version>
+			<scope>system</scope>
+			<systemPath>${gae.home}/lib/appengine-tools-api.jar</systemPath>
+		</dependency>
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
@@ -239,7 +248,7 @@
 			<plugin>
 				<groupId>net.kindleit</groupId>
 				<artifactId>maven-gae-plugin</artifactId>
-				<version>0.8.0</version>
+				<version>0.8.1</version>
 				<executions>
 					<execution>
 						<id />
@@ -280,11 +289,8 @@
 					<hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
 					<server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
 					<copyWebapp>true</copyWebapp>
-					<!-- Keep duplicate JDT off classpath or module will not load 
-					<runClasspathExcludes>
-						<runClasspathExclude>jasper-jdt-6.0.29</runClasspathExclude>
-					</runClasspathExcludes>
-					-->
+					<!-- Keep duplicate JDT off classpath or module will not load <runClasspathExcludes> 
+						<runClasspathExclude>jasper-jdt-6.0.29</runClasspathExclude> </runClasspathExcludes> -->
 				</configuration>
 				<executions>
 					<execution>
@@ -297,67 +303,20 @@
 				</executions>
 			</plugin>
 			<!-- Bundle server-side code only into single JAR to reduce # files transmitted -->
-			<!-- Still experimenting with this 
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<version>2.3.1</version>
-				<executions>
-					<execution>
-						<id>bundle-into-jar</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>jar</goal>
-						</goals>
-						<configuration>
-							<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory>
-							<includes>
-								<include>**/**</include>
-							</includes>
-							<excludes>
-								<exclude>**/client/**</exclude>
-							</excludes>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.3</version>
-				<executions>
-					<execution>
-						<id>default-clean</id>
-						<phase>clean</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>remove-gwt-client-classes</id>
-						<phase>package</phase>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-						<configuration>
-							<excludeDefaultDirectories>true</excludeDefaultDirectories>
-							<filesets>
-								<fileset>
-									<directory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</directory>
-									<includes>
-										<include>**</include>
-									</includes>
-								</fileset>
-								<fileset>
-									<directory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</directory>
-									<includes>
-										<include>gwt-user*jar</include>
-									</includes>
-								</fileset>
-							</filesets>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			-->
+			<!-- Still experimenting with this <plugin> <artifactId>maven-jar-plugin</artifactId> 
+				<version>2.3.1</version> <executions> <execution> <id>bundle-into-jar</id> 
+				<phase>prepare-package</phase> <goals> <goal>jar</goal> </goals> <configuration> 
+				<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</outputDirectory> 
+				<includes> <include>**/**</include> </includes> <excludes> <exclude>**/client/**</exclude> 
+				</excludes> </configuration> </execution> </executions> </plugin> <plugin> 
+				<artifactId>maven-clean-plugin</artifactId> <version>2.3</version> <executions> 
+				<execution> <id>default-clean</id> <phase>clean</phase> <goals> <goal>clean</goal> 
+				</goals> </execution> <execution> <id>remove-gwt-client-classes</id> <phase>package</phase> 
+				<goals> <goal>clean</goal> </goals> <configuration> <excludeDefaultDirectories>true</excludeDefaultDirectories> 
+				<filesets> <fileset> <directory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</directory> 
+				<includes> <include>**</include> </includes> </fileset> <fileset> <directory>${project.build.directory}/${project.build.finalName}/WEB-INF/lib</directory> 
+				<includes> <include>gwt-user*jar</include> </includes> </fileset> </filesets> 
+				</configuration> </execution> </executions> </plugin> -->
 
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -371,7 +330,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
@@ -387,7 +346,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<artifactId>maven-release-plugin</artifactId>
 				<configuration>
