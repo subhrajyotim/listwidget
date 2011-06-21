@@ -8,7 +8,7 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>ListWidget</name>
 	<properties>
-		<gwt.version>2.2.0</gwt.version>
+		<gwt.version>2.3.0</gwt.version>
 		<!-- Default style during dev -->
 		<gwt.style>PRETTY</gwt.style>
 		<gae.version>1.5.0.1</gae.version>

@@ -1,6 +1,6 @@
 package com.turbomanage.listwidget.server.locator;
 
-import com.google.gwt.requestfactory.shared.ServiceLocator;
+import com.google.web.bindery.requestfactory.shared.ServiceLocator;
 
 
 /**

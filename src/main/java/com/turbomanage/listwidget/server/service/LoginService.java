@@ -6,7 +6,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
-import com.google.gwt.requestfactory.server.RequestFactoryServlet;
+import com.google.web.bindery.requestfactory.server.RequestFactoryServlet;
 import com.googlecode.objectify.Key;
 import com.turbomanage.listwidget.domain.AppUser;
 import com.turbomanage.listwidget.shared.TooManyResultsException;
