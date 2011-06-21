@@ -12,7 +12,7 @@ import javax.persistence.Embedded;
 import javax.persistence.Transient;
 
 import com.google.appengine.api.datastore.EntityNotFoundException;
-import com.google.gwt.requestfactory.server.RequestFactoryServlet;
+import com.google.web.bindery.requestfactory.server.RequestFactoryServlet;
 import com.googlecode.objectify.Key;
 import com.googlecode.objectify.ObjectifyService;
 import com.googlecode.objectify.Query;

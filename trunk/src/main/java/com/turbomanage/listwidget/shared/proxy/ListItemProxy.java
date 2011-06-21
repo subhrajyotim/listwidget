@@ -2,8 +2,8 @@ package com.turbomanage.listwidget.shared.proxy;
 
 import java.util.Date;
 
-import com.google.gwt.requestfactory.shared.ProxyFor;
-import com.google.gwt.requestfactory.shared.ValueProxy;
+import com.google.web.bindery.requestfactory.shared.ProxyFor;
+import com.google.web.bindery.requestfactory.shared.ValueProxy;
 import com.turbomanage.listwidget.domain.ListItem;
 
 /**

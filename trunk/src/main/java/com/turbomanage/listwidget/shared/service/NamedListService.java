@@ -2,9 +2,9 @@ package com.turbomanage.listwidget.shared.service;
 
 import java.util.List;
 
-import com.google.gwt.requestfactory.shared.Request;
-import com.google.gwt.requestfactory.shared.RequestContext;
-import com.google.gwt.requestfactory.shared.Service;
+import com.google.web.bindery.requestfactory.shared.Request;
+import com.google.web.bindery.requestfactory.shared.RequestContext;
+import com.google.web.bindery.requestfactory.shared.Service;
 import com.turbomanage.listwidget.server.locator.DaoServiceLocator;
 import com.turbomanage.listwidget.server.service.NamedListDao;
 import com.turbomanage.listwidget.shared.proxy.NamedListProxy;

@@ -1,6 +1,6 @@
 package com.turbomanage.listwidget.server.locator;
 
-import com.google.gwt.requestfactory.shared.Locator;
+import com.google.web.bindery.requestfactory.shared.Locator;
 import com.googlecode.objectify.helper.DAOBase;
 import com.turbomanage.listwidget.domain.DatastoreObject;
 

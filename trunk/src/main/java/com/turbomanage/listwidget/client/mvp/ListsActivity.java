@@ -8,11 +8,12 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.requestfactory.shared.Receiver;
-import com.google.gwt.requestfactory.shared.Request;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
+import com.google.gwt.view.client.ListDataProvider;
 import com.turbomanage.listwidget.client.ClientFactory;
 import com.turbomanage.listwidget.client.event.MessageEvent;
 import com.turbomanage.listwidget.client.ui.ListsView;
@@ -46,18 +47,18 @@ public class ListsActivity extends AbstractActivity implements Activity,
   private Logger logger = Logger.getLogger(ListsActivity.class.getName());
 	private ClientFactory clientFactory;
 	private ListsView display;
-	private ListDataProvider listDataProvider;
+	private NamedListDataProvider listDataProvider;
 	private EventBus eventBus;
   private ListwidgetRequestFactory myRF;
 
-	public static class ListDataProvider extends
-			AsyncDataProvider<NamedListProxy>
+	public static class NamedListDataProvider extends
+			ListDataProvider<NamedListProxy>
 	{
 		private Logger logger = Logger
-				.getLogger(ListsActivity.ListDataProvider.class.getName());
+				.getLogger(ListsActivity.NamedListDataProvider.class.getName());
 		private ListwidgetRequestFactory rf;
 
-		public ListDataProvider(ListwidgetRequestFactory requestFactory)
+		public NamedListDataProvider(ListwidgetRequestFactory requestFactory)
 		{
 			this.rf = requestFactory;
 		}
@@ -89,9 +90,10 @@ public class ListsActivity extends AbstractActivity implements Activity,
 
 	public ListsActivity(ClientFactory cf)
 	{
+	  new ListDataProvider(new ArrayList());
 		this.clientFactory = cf;
 		this.myRF = clientFactory.getRequestFactory();
-		this.listDataProvider = new ListDataProvider(this.myRF);
+		this.listDataProvider = new NamedListDataProvider(this.myRF);
 	}
 
 	@Override
@@ -110,20 +112,25 @@ public class ListsActivity extends AbstractActivity implements Activity,
 	public void persistList(String listName)
 	{
 		NamedListService reqCtx = myRF.namedListService();
-		NamedListProxy newList = reqCtx.create(NamedListProxy.class);
+		final NamedListProxy newList = reqCtx.create(NamedListProxy.class);
 		newList.setName(listName);
 		newList.setItems(new ArrayList<ListItemProxy>());
 		newList.setListType(ListType.TODO);
-		reqCtx.saveAndReturn(newList).fire(new Receiver<NamedListProxy>()
+		reqCtx.save(newList).fire(new Receiver<Void>()
 		{
 			@Override
-			public void onSuccess(NamedListProxy savedList)
+			public void onSuccess(Void v)
 			{
 				// Refresh table
+			  /*
+			   * I think this fails because the recently persisted item is still frozen during this method
+			   * and getData() can't call setters.
+			   * Which means I shouldn't be calling for the whole list including this item.
+			   */
 				listDataProvider.getData();
 				// Go to edit place for the new list
 				String proxyToken = clientFactory.getRequestFactory()
-						.getHistoryToken(savedList.stableId());
+						.getHistoryToken(newList.stableId());
 				clientFactory.getPlaceController().goTo(
 						new EditListPlace(proxyToken));
 			}
