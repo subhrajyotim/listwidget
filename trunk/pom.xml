@@ -288,7 +288,6 @@
 					<logLevel>INFO</logLevel>
 					<style>${gwt.style}</style>
 					<runTarget>/index.jsp</runTarget>
-					<hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
 					<server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
 					<copyWebapp>true</copyWebapp>
 					<!-- Keep duplicate JDT off classpath or module will not load <runClasspathExcludes> 
