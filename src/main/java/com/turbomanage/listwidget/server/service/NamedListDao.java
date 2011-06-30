@@ -36,7 +36,8 @@ public class NamedListDao extends ObjectifyDao<NamedList>
 		Key<NamedList> key = this.put(list);
 		try
 		{
-			return this.get(key);
+//			return this.get(key);
+		  return list;
 		}
 		catch (Exception e)
 		{

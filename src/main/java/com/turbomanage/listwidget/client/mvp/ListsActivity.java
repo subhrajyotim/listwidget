@@ -8,12 +8,11 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.activity.shared.Activity;
 import com.google.gwt.cell.client.FieldUpdater;
 import com.google.gwt.event.shared.EventBus;
-import com.google.web.bindery.requestfactory.shared.Receiver;
-import com.google.web.bindery.requestfactory.shared.Request;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.view.client.AsyncDataProvider;
 import com.google.gwt.view.client.HasData;
 import com.google.gwt.view.client.ListDataProvider;
+import com.google.web.bindery.requestfactory.shared.Receiver;
+import com.google.web.bindery.requestfactory.shared.Request;
 import com.turbomanage.listwidget.client.ClientFactory;
 import com.turbomanage.listwidget.client.event.MessageEvent;
 import com.turbomanage.listwidget.client.ui.ListsView;
@@ -111,29 +110,20 @@ public class ListsActivity extends AbstractActivity implements Activity,
 
 	public void persistList(String listName)
 	{
-		NamedListService reqCtx = myRF.namedListService();
+	  NamedListService reqCtx = myRF.namedListService();
 		final NamedListProxy newList = reqCtx.create(NamedListProxy.class);
 		newList.setName(listName);
 		newList.setItems(new ArrayList<ListItemProxy>());
 		newList.setListType(ListType.TODO);
-		reqCtx.save(newList).fire(new Receiver<Void>()
+		reqCtx.saveAndReturn(newList).fire(new Receiver<NamedListProxy>()
 		{
-			@Override
-			public void onSuccess(Void v)
-			{
-				// Refresh table
-			  /*
-			   * I think this fails because the recently persisted item is still frozen during this method
-			   * and getData() can't call setters.
-			   * Which means I shouldn't be calling for the whole list including this item.
-			   */
-				listDataProvider.getData();
-				// Go to edit place for the new list
-				String proxyToken = clientFactory.getRequestFactory()
-						.getHistoryToken(newList.stableId());
-				clientFactory.getPlaceController().goTo(
-						new EditListPlace(proxyToken));
-			}
+      @Override
+      public void onSuccess(NamedListProxy response) {
+        listDataProvider.getData();
+        // Go to edit place for the new list
+        String proxyToken = clientFactory.getRequestFactory().getHistoryToken(newList.stableId());
+        clientFactory.getPlaceController().goTo(new EditListPlace(proxyToken));
+      }
 		});
 	}
 
