@@ -8,10 +8,10 @@
 	<version>1.0-SNAPSHOT</version>
 	<name>ListWidget</name>
 	<properties>
-		<gwt.version>2.3.0</gwt.version>
+		<gwt.version>2.4.0-rc1</gwt.version>
 		<!-- Default style during dev -->
 		<gwt.style>PRETTY</gwt.style>
-		<gae.version>1.5.0.1</gae.version>
+		<gae.version>1.5.2</gae.version>
 		<gae.home>${user.home}/.m2/repository/com/google/appengine/appengine-java-sdk/${gae.version}/appengine-java-sdk-${gae.version}</gae.home>
 		<gae.application.version>1</gae.application.version>
 	</properties>
@@ -19,10 +19,6 @@
 		<repository>
 			<id>objectify-appengine</id>
 			<url>http://objectify-appengine.googlecode.com/svn/maven</url>
-		</repository>
-		<repository>
-			<id>gae staging</id>
-			<url>https://oss.sonatype.org/content/repositories/comgoogleappengine-092</url>
 		</repository>
 	</repositories>
 	<dependencies>
@@ -109,17 +105,6 @@
 			<version>20090211</version>
 		</dependency>
 		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.0.0.GA</version>
-		</dependency>
-		<dependency>
-			<groupId>javax.validation</groupId>
-			<artifactId>validation-api</artifactId>
-			<version>1.0.0.GA</version>
-			<classifier>sources</classifier>
-		</dependency>
-		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>4.0.2.GA</version>
@@ -146,6 +131,7 @@
 			<artifactId>objectify</artifactId>
 			<version>2.2.3</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>com.google.inject</groupId>
 			<artifactId>guice</artifactId>
@@ -161,6 +147,7 @@
 			<artifactId>gin</artifactId>
 			<version>1.0</version>
 		</dependency>
+		 -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
@@ -290,8 +277,6 @@
 					<runTarget>/index.jsp</runTarget>
 					<server>com.google.appengine.tools.development.gwt.AppEngineLauncher</server>
 					<copyWebapp>true</copyWebapp>
-					<!-- Keep duplicate JDT off classpath or module will not load <runClasspathExcludes> 
-						<runClasspathExclude>jasper-jdt-6.0.29</runClasspathExclude> </runClasspathExcludes> -->
 				</configuration>
 				<executions>
 					<execution>
