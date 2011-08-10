@@ -338,6 +338,16 @@ public class SliderBar extends FocusPanel implements RequiresResize, HasValue<Do
     DOM.setElementProperty(knobElement, "className", "gwt-SliderBar-knob");
 
     sinkEvents(Event.MOUSEEVENTS | Event.KEYEVENTS | Event.FOCUSEVENTS);
+    
+    // workaround to render properly when parent Widget does not
+    // implement ProvidesResize since DOM doesn't provide element
+    // height and width until onModuleLoad() finishes.
+    Scheduler.get().scheduleDeferred(new ScheduledCommand() {
+      @Override
+      public void execute() {
+        onResize();
+      }
+    });
   }
 
   public HandlerRegistration addValueChangeHandler(ValueChangeHandler<Double> handler) {
@@ -779,15 +789,6 @@ public class SliderBar extends FocusPanel implements RequiresResize, HasValue<Do
   protected void onLoad() {
     // Reset the position attribute of the parent element
     DOM.setStyleAttribute(getElement(), "position", "relative");
-    // workaround to render properly when parent Widget does not
-    // implement ProvidesResize since DOM doesn't provide element
-    // height and width until onModuleLoad() finishes.
-    Scheduler.get().scheduleDeferred(new ScheduledCommand() {
-      @Override
-      public void execute() {
-        onResize();
-      }
-    });
   }
 
   /**
