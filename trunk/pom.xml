@@ -11,7 +11,7 @@
 		<gwt.version>2.4.0-rc1</gwt.version>
 		<!-- Default style during dev -->
 		<gwt.style>PRETTY</gwt.style>
-		<gae.version>1.5.2</gae.version>
+		<gae.version>1.5.3</gae.version>
 		<gae.home>${user.home}/.m2/repository/com/google/appengine/appengine-java-sdk/${gae.version}/appengine-java-sdk-${gae.version}</gae.home>
 		<gae.application.version>1</gae.application.version>
 	</properties>
@@ -65,23 +65,6 @@
 			<artifactId>appengine-api-labs</artifactId>
 			<version>${gae.version}</version>
 		</dependency>
-		<!-- uncomment next 2 to write GAE unit tests, run mvn package first to expand appengine-java-sdk -->
-		<!-- 
-		<dependency>
-			<groupId>com.google.appengine</groupId>
-			<artifactId>appengine-local-runtime</artifactId>
-			<version>${gae.version}</version>
-			<scope>system</scope>
-			<systemPath>${gae.home}/lib/impl/appengine-local-runtime.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>com.google.appengine</groupId>
-			<artifactId>appengine-tools-api</artifactId>
-			<version>${gae.version}</version>
-			<scope>system</scope>
-			<systemPath>${gae.home}/lib/appengine-tools-api.jar</systemPath>
-		</dependency>
-		 -->
 		<dependency>
 			<groupId>javax.persistence</groupId>
 			<artifactId>persistence-api</artifactId>
@@ -131,23 +114,6 @@
 			<artifactId>objectify</artifactId>
 			<version>2.2.3</version>
 		</dependency>
-		<!-- 
-		<dependency>
-			<groupId>com.google.inject</groupId>
-			<artifactId>guice</artifactId>
-			<version>2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>aopalliance</groupId>
-			<artifactId>aopalliance</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.google.gwt.inject</groupId>
-			<artifactId>gin</artifactId>
-			<version>1.0</version>
-		</dependency>
-		 -->
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
@@ -340,6 +306,50 @@
 				</configuration>
 			</plugin>
 		</plugins>
+
+		<pluginManagement>
+			<plugins>
+				<!--This plugin's configuration is used to store Eclipse m2e settings 
+					only. It has no influence on the Maven build itself. -->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>org.datanucleus</groupId>
+										<artifactId>maven-datanucleus-plugin</artifactId>
+										<versionRange>[1.1.4,)</versionRange>
+										<goals>
+											<goal>enhance</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>net.kindleit</groupId>
+										<artifactId>maven-gae-plugin</artifactId>
+										<versionRange>[0.7.3,)</versionRange>
+										<goals>
+											<goal>unpack</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<execute />
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 
 		<outputDirectory>${project.build.directory}/${project.build.finalName}/WEB-INF/classes</outputDirectory>
 	</build>
