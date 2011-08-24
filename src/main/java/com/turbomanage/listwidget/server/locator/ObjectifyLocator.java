@@ -1,8 +1,8 @@
 package com.turbomanage.listwidget.server.locator;
 
 import com.google.web.bindery.requestfactory.shared.Locator;
-import com.googlecode.objectify.helper.DAOBase;
 import com.turbomanage.listwidget.domain.DatastoreObject;
+import com.turbomanage.listwidget.server.service.ObjectifyDao;
 
 /**
  * Generic @Locator for objects that extend DatastoreObject
@@ -21,7 +21,7 @@ public class ObjectifyLocator extends Locator<DatastoreObject, Long> {
 
   @Override
   public DatastoreObject find(Class<? extends DatastoreObject> clazz, Long id) {
-    DAOBase daoBase = new DAOBase();
+    ObjectifyDao daoBase = new ObjectifyDao();
     return daoBase.ofy().find(clazz, id);
   }
 
