@@ -285,33 +285,6 @@
         <includes> <include>gwt-user*jar</include> </includes> </fileset> </filesets> </configuration> 
         </execution> </executions> </plugin> -->
 
-      <!-- Run the RequestFactory ValidationTool 
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2</version>
-        <executions>
-          <execution>
-            <phase>process-classes</phase>
-            <configuration>
-              <id>VerifyRequestFactoryInterfaces</id>
-              <executable>java</executable>
-              <arguments>
-                <argument>-cp</argument>
-                <classpath />
-                <argument>com.google.web.bindery.requestfactory.apt.ValidationTool</argument>
-                <argument>${project.build.outputDirectory}</argument>
-                <argument>com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory</argument>
-              </arguments>
-            </configuration>
-            <goals>
-              <goal>exec</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-      -->
-
       <!-- requestfactory-apt runs an annotation processor (APT) to
            instrument its service interfaces so that
            RequestFactoryServer can decode client requests. Normally
@@ -336,7 +309,7 @@
           <dependency>
             <groupId>com.google.web.bindery</groupId>
             <artifactId>requestfactory-apt</artifactId>
-            <version>${gwtVersion}</version>
+            <version>${gwt.version}</version>
           </dependency>
         </dependencies>
       </plugin>
