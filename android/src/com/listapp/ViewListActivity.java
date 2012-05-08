@@ -24,7 +24,7 @@ public class ViewListActivity extends ListActivity implements OnItemClickListene
 		setListAdapter(adapter);
 		getListView().setAdapter(adapter);
 		getListView().setOnItemClickListener(this);
-		new FetchItemsTask(this).execute(null);
+		new FetchItemsTask(this).execute();
 	}
 
 	@Override

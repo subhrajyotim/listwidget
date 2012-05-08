@@ -16,7 +16,6 @@ package com.listapp;
 
 import java.util.List;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -28,6 +27,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -36,7 +37,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
+import android.widget.Toast;
 
+import com.example.android.actionbarcompat.ActionBarActivity;
 import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
 import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory;
 
@@ -44,7 +47,7 @@ import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory;
  * Main activity - requests all lists from the server and provides
  * a menu item to invoke the accounts activity.
  */
-public class ListappActivity extends Activity implements OnItemClickListener {
+public class ListappActivity extends ActionBarActivity implements OnItemClickListener {
 	/**
 	 * Tag for logging.
 	 */
@@ -82,6 +85,7 @@ public class ListappActivity extends Activity implements OnItemClickListener {
 		listView = (ListView) findViewById(R.id.main);
 		listView.setAdapter(adapter);
 		listView.setOnItemClickListener(this);
+		
 		// TODO two calls to setContentView?
 		// moved from onResume
 		final SharedPreferences prefs = Util.getSharedPreferences(mContext);
@@ -164,16 +168,31 @@ public class ListappActivity extends Activity implements OnItemClickListener {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
+		case android.R.id.home:
+			Toast.makeText(this, "home", Toast.LENGTH_SHORT).show();
+			break;
 		case R.id.menu_refresh:
 			fetchLists();
 			break;
-
+		case R.id.action_new_list:
+			showNewListDialog();
+			break;
 		default:
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
+	private void showNewListDialog() {
+		FragmentManager fm = this.getSupportFragmentManager();
+		NewListDialog newListDialog = new NewListDialog();
+		newListDialog.show(fm, "new_list_dialog");
+	}
+	
+	void onFinishNewListDialog(String newListName) {
+		Toast.makeText(this, newListName, Toast.LENGTH_SHORT).show();
+	}
+	
 	public void showError(String message) {
 		dismissDialog(LOADING_DIALOG);
 		errDialogMsg = message;
