@@ -3,6 +3,8 @@ package com.turbomanage.listwidget.domain;
 import java.util.List;
 
 import javax.persistence.Embedded;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.googlecode.objectify.Key;
@@ -15,6 +17,7 @@ import com.turbomanage.listwidget.shared.proxy.ListType;
  * The items are stored as an embedded object.
  */
 @Entity
+@XmlRootElement
 public class NamedList extends DatastoreObject
 {
 	private String name;

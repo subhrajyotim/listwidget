@@ -11,6 +11,8 @@ import java.util.Map;
 
 import javax.persistence.Embedded;
 import javax.persistence.Transient;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.core.Context;
 
 import com.google.appengine.api.datastore.EntityNotFoundException;
 import com.google.web.bindery.requestfactory.server.RequestFactoryServlet;
@@ -42,6 +44,10 @@ public class ObjectifyDao<T> extends DAOBase
 	}
 
 	protected Class<T> clazz;
+	
+	// For Jersey
+	@Context
+	HttpServletRequest req;
 
 	public ObjectifyDao()
 	{
@@ -237,8 +243,10 @@ public class ObjectifyDao<T> extends DAOBase
 
 	private AppUser getCurrentUser()
 	{
-		return (AppUser) RequestFactoryServlet.getThreadLocalRequest()
-				.getAttribute("loggedInUser");
+        return (AppUser) req.getAttribute("loggedInUser");
+//		return (AppUser) RequestFactoryServlet.getThreadLocalRequest()
+//				.getAttribute("loggedInUser");
+	    
 	}
 
 }
