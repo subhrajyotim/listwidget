@@ -12,30 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
+
 package com.listapp;
-
-import com.google.android.c2dm.C2DMessaging;
-
-import org.apache.http.Header;
-import org.apache.http.HttpResponse;
-import org.apache.http.StatusLine;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.params.ClientPNames;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.DefaultHttpClient;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
-import android.content.SharedPreferences.Editor;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.accounts.AccountManagerCallback;
 import android.accounts.AccountManagerFuture;
-import android.accounts.AuthenticatorException;
-import android.accounts.OperationCanceledException;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -51,6 +34,10 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Account selections activity - handles device registration and unregistration.
@@ -165,7 +152,7 @@ public class AccountsActivity extends Activity {
         disconnectButton.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 // Unregister
-//                C2DMessaging.unregister(mContext);
+                // C2DMessaging.unregister(mContext);
                 finish();
             }
         });
@@ -198,9 +185,9 @@ public class AccountsActivity extends Activity {
         final SharedPreferences prefs = Util.getSharedPreferences(mContext);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putString(Util.ACCOUNT_NAME, accountName);
-        editor.remove(Util.AUTH_COOKIE);
         editor.remove(Util.DEVICE_REGISTRATION_ID);
         editor.commit();
+        BasicHttpClient.getCookieManager().getCookieStore().removeAll();
 
         // Obtain an auth token and register
         final AccountManager mgr = AccountManager.get(mContext);
@@ -209,41 +196,54 @@ public class AccountsActivity extends Activity {
             final Account account = acct;
             if (account.name.equals(accountName)) {
                 if (Util.isDebug(mContext)) {
-                    // Use a fake cookie for the dev mode app engine server
-                    // The cookie has the form email:isAdmin:userId
-                    // We set the userId to be the same as the email
-                    String authCookie = "dev_appserver_login=" + accountName + ":false:"
-                            + accountName;
-                    prefs.edit().putString(Util.AUTH_COOKIE, authCookie).commit();
-//                    C2DMessaging.register(mContext, Setup.SENDER_ID);
+                    loginDev(accountName);
+                    // C2DMessaging.register(mContext, Setup.SENDER_ID);
                 } else {
                     // Get the auth token from the AccountManager and convert
                     // it into a cookie for the appengine server
                     final Activity activity = this;
-                    mgr.getAuthToken(account, "ah", null, activity, new AccountManagerCallback<Bundle>() {
-                        public void run(AccountManagerFuture<Bundle> future) {
-                            String authToken = getAuthToken(future);
-                            // Ensure the token is not expired by invalidating it and
-                            // obtaining a new one
-                            mgr.invalidateAuthToken(account.type, authToken);
-                            mgr.getAuthToken(account, "ah", null, activity, new AccountManagerCallback<Bundle>() {
+                    mgr.getAuthToken(account, "ah", null, activity,
+                            new AccountManagerCallback<Bundle>() {
                                 public void run(AccountManagerFuture<Bundle> future) {
                                     String authToken = getAuthToken(future);
-                                    // Convert the token into a cookie for future use
-                                    String authCookie = getAuthCookie(authToken);
-                                    Editor editor = prefs.edit();
-                                    editor.putString(Util.AUTH_COOKIE, authCookie);
-                                    editor.commit();
-                                    // TODO put back when ready
-//                                    C2DMessaging.register(mContext, Setup.SENDER_ID);
+                                    // Ensure the token is not expired by
+                                    // invalidating it and
+                                    // obtaining a new one
+                                    mgr.invalidateAuthToken(account.type, authToken);
+                                    mgr.getAuthToken(account, "ah", null, activity,
+                                            new AccountManagerCallback<Bundle>() {
+                                                public void run(AccountManagerFuture<Bundle> future) {
+                                                    String authToken = getAuthToken(future);
+                                                    // Convert the token into a
+                                                    // cookie for future use
+                                                    loginProd(authToken);
+                                                    // TODO put back when ready
+                                                    // C2DMessaging.register(mContext,
+                                                    // Setup.SENDER_ID);
+                                                }
+                                            }, null);
                                 }
                             }, null);
-                        }
-                    }, null);
                 }
                 break;
             }
         }
+    }
+
+    public void loginDev(String userEmail) {
+        BasicHttpClient httpClient = new BasicHttpClient(Util.getBaseUrl(this));
+        Map<String, String> params = httpClient.newQueryParams();
+        params.put("email", userEmail);
+        params.put("action", "Log In");
+        params.put("continue", "/");
+        httpClient.doPost("/_ah/login", params);
+    }
+
+    public void loginProd(String authToken) {
+        BasicHttpClient httpClient = new BasicHttpClient(Util.getBaseUrl(this));
+        Map<String, String> params = httpClient.newQueryParams();
+        params.put("auth", authToken);
+        httpClient.doGet("/_ah/login", params);
     }
 
     private String getAuthToken(AccountManagerFuture<Bundle> future) {
@@ -258,42 +258,6 @@ public class AccountsActivity extends Activity {
     }
 
     // Utility Methods
-
-    /**
-     * Retrieves the authorization cookie associated with the given token. This
-     * method should only be used when running against a production appengine
-     * backend (as opposed to a dev mode server).
-     */
-    private String getAuthCookie(String authToken) {
-        DefaultHttpClient httpClient = new DefaultHttpClient();
-        try {
-            // Get SACSID cookie
-            httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, false);
-            String uri = Setup.PROD_URL + "/_ah/login?continue=http://localhost/&auth=" + authToken;
-            HttpGet method = new HttpGet(uri);
-
-            HttpResponse res = httpClient.execute(method);
-            StatusLine statusLine = res.getStatusLine();
-            int statusCode = statusLine.getStatusCode();
-            Header[] headers = res.getHeaders("Set-Cookie");
-            if (statusCode != 302 || headers.length == 0) {
-                return null;
-            }
-
-            for (Cookie cookie : httpClient.getCookieStore().getCookies()) {
-                if (AUTH_COOKIE_NAME.equals(cookie.getName())) {
-                    return AUTH_COOKIE_NAME + "=" + cookie.getValue();
-                }
-            }
-        } catch (IOException e) {
-            Log.w(TAG, "Got IOException " + e);
-            Log.w(TAG, Log.getStackTraceString(e));
-        } finally {
-            httpClient.getParams().setBooleanParameter(ClientPNames.HANDLE_REDIRECTS, true);
-        }
-
-        return null;
-    }
 
     /**
      * Returns a list of registered Google account names. If no Google accounts

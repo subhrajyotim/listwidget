@@ -1,15 +1,15 @@
 package com.listapp;
 
-import java.util.List;
-
-import com.turbomanage.listwidget.shared.proxy.ListItemProxy;
-
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
+
+import com.listapp.model.ListItem;
+
+import java.util.List;
 
 public class ViewListActivity extends ListActivity implements OnItemClickListener {
 
@@ -34,9 +34,9 @@ public class ViewListActivity extends ListActivity implements OnItemClickListene
 		
 	}
 
-	public void setItems(List<ListItemProxy> result) {
+	public void setItems(List<ListItem> result) {
 		adapter.clear();
-		for (ListItemProxy listItemProxy : result) {
+		for (ListItem listItemProxy : result) {
 			adapter.add(listItemProxy.getItemText());
 		}
 	}

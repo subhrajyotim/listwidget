@@ -14,6 +14,10 @@ import android.widget.TextView.OnEditorActionListener;
 
 public class NewListDialog extends DialogFragment implements OnEditorActionListener {
 
+    public interface NewListDialogListener {
+        void addList (String name);
+    }
+    
 	private EditText editText;
 
 	public NewListDialog() {
@@ -35,8 +39,8 @@ public class NewListDialog extends DialogFragment implements OnEditorActionListe
     @Override
     public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
-            ListappActivity activity = (ListappActivity) getActivity();
-            activity.onFinishNewListDialog(editText.getText().toString());
+            NewListDialogListener activity = (NewListDialogListener) getActivity();
+            activity.addList(editText.getText().toString());
             NewListDialog.this.dismiss();
             return true;
         }

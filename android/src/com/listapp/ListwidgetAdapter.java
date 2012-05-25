@@ -1,8 +1,5 @@
 package com.listapp;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +8,11 @@ import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
+import com.listapp.dao.NamedListDao;
+import com.listapp.model.NamedList;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ListwidgetAdapter extends BaseAdapter implements ListAdapter {
 
@@ -20,13 +21,17 @@ public class ListwidgetAdapter extends BaseAdapter implements ListAdapter {
 	}
 
 	private LayoutInflater inflater;
+    private Context mContext;
 
 	public ListwidgetAdapter(Context context) {
+	    this.mContext = context;
         inflater = (LayoutInflater) context
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        namedListDao = new NamedListDao(mContext);
 	}
 	
-	private List<NamedListProxy> lists = new ArrayList<NamedListProxy>();
+	private List<NamedList> lists = new ArrayList<NamedList>();
+    private NamedListDao namedListDao;
 	
 	@Override
 	public int getCount() {
@@ -34,7 +39,7 @@ public class ListwidgetAdapter extends BaseAdapter implements ListAdapter {
 	}
 
 	@Override
-	public NamedListProxy getItem(int position) {
+	public NamedList getItem(int position) {
 		return lists.get(position);
 	}
 
@@ -55,12 +60,12 @@ public class ListwidgetAdapter extends BaseAdapter implements ListAdapter {
             holder = (ViewHolder) convertView.getTag();
         }
 
-        NamedListProxy list = lists.get(position);
-        holder.listNameView.setText(list.getName());
+        NamedList list = lists.get(position);
+        holder.listNameView.setText(list.name);
         return convertView;
 	}
 
-	protected void setLists(List<NamedListProxy> argLists) {
+	protected void setLists(List<NamedList> argLists) {
 		lists.clear();
 		if (argLists != null) {
 			lists.addAll(argLists);
@@ -68,4 +73,13 @@ public class ListwidgetAdapter extends BaseAdapter implements ListAdapter {
 		}
 	}
 
+    public void reQuery() {
+        lists.clear();
+        List<NamedList> listAll = namedListDao.listAll();
+        lists.addAll(listAll);
+        notifyDataSetChanged();
+    }
+	
+	
+	
 }
