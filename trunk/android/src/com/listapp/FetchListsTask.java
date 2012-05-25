@@ -1,77 +1,54 @@
+
 package com.listapp;
 
+import android.os.AsyncTask;
+
+import com.listapp.model.NamedList;
+
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
 import java.util.List;
 
-import android.os.AsyncTask;
-import android.util.Log;
+public class FetchListsTask extends AsyncTask<Void, Void, List<NamedList>> {
 
-import com.google.web.bindery.event.shared.UmbrellaException;
-import com.google.web.bindery.requestfactory.shared.Receiver;
-import com.google.web.bindery.requestfactory.shared.Request;
-import com.google.web.bindery.requestfactory.shared.ServerFailure;
-import com.turbomanage.listwidget.shared.proxy.NamedListProxy;
-import com.turbomanage.listwidget.shared.service.ListwidgetRequestFactory;
+    private static final String TAG = FetchListsTask.class.getName();
+    private ListappActivity activity;
+    private String errMsg;
 
-public class FetchListsTask extends AsyncTask<Void, Void, List<NamedListProxy>> {
+    public FetchListsTask(ListappActivity activity) {
+        this.activity = activity;
+    }
 
-	private static final String TAG = FetchListsTask.class.getName();
-	private ListappActivity activity;
-	private List<NamedListProxy> resultLists;
-	private String errMsg;
-	
-	public FetchListsTask(ListappActivity activity) {
-		this.activity = activity;
-	}
-	
-	@Override
-	protected List<NamedListProxy> doInBackground(Void... params) {
-		
-        ListwidgetRequestFactory requestFactory = Util.getRequestFactory(activity,
-                ListwidgetRequestFactory.class);
-        Request<List<NamedListProxy>> listAllRequest = requestFactory.namedListService().listAll();
-
+    @Override
+    protected List<NamedList> doInBackground(Void... params) {
+        String namedListUrl = Util.getBaseUrl(activity) + "/resources/namedList/all";
+        RestTemplate restTemplate = new RestTemplate();
         try {
-			listAllRequest.fire(new Receiver<List<NamedListProxy>>() {
+            NamedList[] namedLists = restTemplate.getForObject(namedListUrl, NamedList[].class);
+            return Arrays.asList(namedLists);
+        } catch (RestClientException e) {
+            e.printStackTrace();
+            errMsg = "Log In";
+            cancel(true);
+        }
+        return null;
+    }
 
-				@Override
-				public void onSuccess(List<NamedListProxy> lists) {
-					resultLists = lists;
-				}
-				
-				@Override
-				public void onFailure(ServerFailure error) {
-					super.onFailure(error);
-					errMsg = error.getMessage();
-					Log.w(TAG, errMsg);
-					cancel(true);
-				}
-				
-			});
-		} catch (Exception e) {
-			e.printStackTrace();
-			if (e instanceof UmbrellaException) {
-				errMsg = e.getCause().getLocalizedMessage();
-			} else {
-				errMsg = e.getLocalizedMessage();
-			}
-			cancel(true);
-		} 
-		return resultLists;
-	}
-	
-	@Override
-	protected void onPostExecute(List<NamedListProxy> result) {
-		super.onPostExecute(result);
-		activity.setLists(result);
-	}
-	
-	@Override
-	protected void onCancelled() {
-		if ((errMsg != null) && (errMsg.contains("Log In"))) {
-			activity.login();
-		} else {
-			activity.showError(errMsg);
-		}
-	}
+    @Override
+    protected void onPostExecute(List<NamedList> result) {
+        super.onPostExecute(result);
+        activity.setLists(result);
+    }
+
+    @Override
+    protected void onCancelled() {
+        if ((errMsg != null) && (errMsg.contains("Log In"))) {
+            activity.login();
+        } else {
+            activity.showError(errMsg);
+        }
+    }
 
 }

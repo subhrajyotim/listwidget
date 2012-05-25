@@ -14,21 +14,7 @@
  *******************************************************************************/
 package com.listapp;
 
-import com.google.web.bindery.event.shared.SimpleEventBus;
-import com.google.web.bindery.requestfactory.shared.RequestFactory;
-import com.google.web.bindery.requestfactory.vm.RequestFactorySource;
-
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -36,6 +22,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.AssetManager;
 import android.util.Log;
+
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Utility methods for getting the base URL for client-server communication and
@@ -54,11 +49,6 @@ public class Util {
      * Key for account name in shared preferences.
      */
     public static final String ACCOUNT_NAME = "accountName";
-
-    /**
-     * Key for auth cookie name in shared preferences.
-     */
-    public static final String AUTH_COOKIE = "authCookie";
 
     /**
      * Key for connection status in shared preferences.
@@ -153,26 +143,26 @@ public class Util {
      * Creates and returns an initialized {@link RequestFactory} of the given
      * type.
      */
-    public static <T extends RequestFactory> T getRequestFactory(Context context,
-            Class<T> factoryClass) {
-        T requestFactory = RequestFactorySource.create(factoryClass);
-
-        SharedPreferences prefs = getSharedPreferences(context);
-        String authCookie = prefs.getString(Util.AUTH_COOKIE, null);
-
-        String uriString = Util.getBaseUrl(context) + RF_METHOD;
-        URI uri;
-        try {
-            uri = new URI(uriString);
-        } catch (URISyntaxException e) {
-            Log.w(TAG, "Bad URI: " + uriString, e);
-            return null;
-        }
-        requestFactory.initialize(new SimpleEventBus(),
-                new AndroidRequestTransport(uri, authCookie));
-
-        return requestFactory;
-    }
+//    public static <T extends RequestFactory> T getRequestFactory(Context context,
+//            Class<T> factoryClass) {
+//        T requestFactory = RequestFactorySource.create(factoryClass);
+//
+//        SharedPreferences prefs = getSharedPreferences(context);
+//        String authCookie = prefs.getString(Util.AUTH_COOKIE, null);
+//
+//        String uriString = Util.getBaseUrl(context) + RF_METHOD;
+//        URI uri;
+//        try {
+//            uri = new URI(uriString);
+//        } catch (URISyntaxException e) {
+//            Log.w(TAG, "Bad URI: " + uriString, e);
+//            return null;
+//        }
+//        requestFactory.initialize(new SimpleEventBus(),
+//                new AndroidRequestTransport(uri, authCookie));
+//
+//        return requestFactory;
+//    }
 
     /**
      * Helper method to get a SharedPreferences instance.
@@ -239,5 +229,9 @@ public class Util {
      */
     private static String getPackageName() {
         return Util.class.getPackage().getName();
+    }
+    
+    public static ListwidgetApplication getApplication(Activity activity) {
+        return (ListwidgetApplication) activity.getApplication();
     }
 }
