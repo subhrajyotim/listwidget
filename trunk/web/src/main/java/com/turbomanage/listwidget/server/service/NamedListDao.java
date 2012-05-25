@@ -2,6 +2,12 @@ package com.turbomanage.listwidget.server.service;
 
 import java.util.List;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.MediaType;
+
 import com.googlecode.objectify.Key;
 import com.turbomanage.listwidget.domain.AppUser;
 import com.turbomanage.listwidget.domain.NamedList;
@@ -9,9 +15,13 @@ import com.turbomanage.listwidget.domain.NamedList;
 /**
  * @author turbomanage
  */
+@Path("namedList")
 public class NamedListDao extends ObjectifyDao<NamedList>
 {
 	@Override
+	@Path("all")
+	@GET
+	@Produces({MediaType.APPLICATION_JSON})
 	public List<NamedList> listAll()
 	{
 		return this.listAllForUser();
