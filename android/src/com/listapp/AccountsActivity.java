@@ -232,18 +232,19 @@ public class AccountsActivity extends Activity {
 
     public void loginDev(String userEmail) {
         BasicHttpClient httpClient = new BasicHttpClient(Util.getBaseUrl(this));
+        httpClient.setRequestInterceptor(new RequestLogger());
         Map<String, String> params = httpClient.newQueryParams();
+        params.put("continue", "/");
         params.put("email", userEmail);
         params.put("action", "Log In");
-        params.put("continue", "/");
-        httpClient.doPost("/_ah/login", params);
+        String res = httpClient.post("/_ah/login", params);
     }
 
     public void loginProd(String authToken) {
         BasicHttpClient httpClient = new BasicHttpClient(Util.getBaseUrl(this));
         Map<String, String> params = httpClient.newQueryParams();
         params.put("auth", authToken);
-        httpClient.doGet("/_ah/login", params);
+        httpClient.get("/_ah/login", params);
     }
 
     private String getAuthToken(AccountManagerFuture<Bundle> future) {

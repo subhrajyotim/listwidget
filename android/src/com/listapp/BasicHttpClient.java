@@ -1,10 +1,11 @@
 
 package com.listapp;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
@@ -13,6 +14,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -20,10 +22,47 @@ import java.util.Scanner;
  * Basic HTTP client that facilitates simple GET and POST requests using
  * HttpUrlConnection.
  * 
- * @author drfibonacci
+ * @author David M. Chandler
  */
 public class BasicHttpClient {
 
+    /**
+     * Interface hook whereby callers can get access to properties of the
+     * HttpUrlConnection and I/O streams. This might be used to check response
+     * code, set a content type, or stream content from a source other than the
+     * parameter maps. Register with
+     * {@link BasicHttpClient#setRequestInterceptor(RequestInterceptor)}.
+     * 
+     * @author David M. Chandler
+     */
+    public interface RequestInterceptor {
+        /**
+         * Called before writing to the OutputStream, so it's possible to set or
+         * modify connection properties. This method may be empty. If the
+         * implementation completes writing to the OutputStream, it should
+         * return true so that BasicHttpClient can close it without reading.
+         * 
+         * @param urlConnection Exposes the current connection
+         * @return boolean True if the method wrote to the OutputStream
+         * @throws IOException
+         */
+        boolean onBeforeWrite(HttpURLConnection urlConnection, String content) throws IOException;
+
+        /**
+         * Called before reading from the InputStream, so it's possible to check
+         * response code or use a custom reader. This method may be empty. If
+         * the implementation consumes the InputStream, it should return true so
+         * that BasicHttpClient can close it without reading.
+         * 
+         * @param urlConnection Exposes the current connection
+         * @param in Exposes the open InputStream
+         * @return boolean True if the method consumed the InputStream
+         * @throws IOException
+         */
+        boolean onBeforeRead(HttpURLConnection urlConnection) throws IOException;
+    }
+
+    private static final String TAG = BasicHttpClient.class.getName();
     public static final String UTF8 = "UTF-8";
     public static final String URLENCODED = "application/x-www-form-urlencoded;charset=UTF-8";
     public static final String MULTIPART = "multipart/form-data";
@@ -37,11 +76,12 @@ public class BasicHttpClient {
     private String baseUrl;
 
     private HttpURLConnection uc;
+    private RequestInterceptor requestInterceptor;
 
     static {
         ensureCookieManager();
     }
-    
+
     /**
      * Constructs a new client with base URL that can be appended in the get()
      * or post() methods. Initializes the CookieManager. Should not end in "/".
@@ -52,32 +92,32 @@ public class BasicHttpClient {
         this.baseUrl = baseUrl;
     }
 
-    public String doGet(String path, Map<String, String> params) {
+    public String get(String path, Map<String, String> params) {
         String queryString = null;
         if (params != null) {
-            queryString = getQueryString(params);
+            queryString = urlEncode(params);
         }
-        return doHttpMethod(path, GET, queryString);
+        return doHttpMethod(path + "?" + queryString, GET, null);
     }
 
-    public String doPost(String path, Map<String, String> params) {
+    public String post(String path, Map<String, String> params) {
         String data = null;
         if (params != null) {
-            data = getQueryString(params);
+            data = urlEncode(params);
         }
         return doHttpMethod(path, POST, data);
     }
 
-    public String doPut(String path, String content) {
-        return doHttpMethod(path, POST, content);
+    public String put(String path, String content) {
+        return doHttpMethod(path, PUT, content);
     }
 
-    public String doDelete(String path, Map<String, String> params) {
-        String data = null;
+    public String delete(String path, Map<String, String> params) {
+        String queryString = null;
         if (params != null) {
-            data = getQueryString(params);
+            queryString = urlEncode(params);
         }
-        return doHttpMethod(path, POST, data);
+        return doHttpMethod(path + queryString, DELETE, null);
     }
 
     /**
@@ -90,8 +130,6 @@ public class BasicHttpClient {
      */
     protected String doHttpMethod(String path, int httpMethod, String content) {
 
-        OutputStream out = null;
-        InputStream in = null;
         String resBody = null;
 
         // Just in case
@@ -109,7 +147,7 @@ public class BasicHttpClient {
         }
 
         uc.setRequestProperty("Accept-Charset", UTF8);
-        uc.setReadTimeout(5000);
+        uc.setReadTimeout(2000);
         try {
             switch (httpMethod) {
                 case GET:
@@ -126,8 +164,6 @@ public class BasicHttpClient {
                     break;
                 case DELETE:
                     uc.setRequestMethod("DELETE");
-                    uc.setDoOutput(true);
-                    uc.setRequestProperty("Content-Type", URLENCODED);
                     break;
 
                 default:
@@ -138,57 +174,81 @@ public class BasicHttpClient {
             return null;
         }
 
-        int contentLength = (content == null) ? 0 : content.length(); 
-        if (uc.getDoOutput() && contentLength > 0) {
-            try {
-                uc.setFixedLengthStreamingMode(content.length());
-                out = uc.getOutputStream();
-                out.write(content.getBytes(UTF8));
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                // Close out before opening in to tell server request is
-                // complete
-                if (out != null)
-                    try {
-                        out.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            }
-        }
-
-        // Read response
         try {
-            in = uc.getInputStream();
-            resBody = read(in);
-        } catch (Exception e) {
-            e.printStackTrace();
+            if (uc.getDoOutput() && content != null) {
+                writeOutputStream(content);
+            }
+            resBody = readInputStream();
         } finally {
-            if (in != null)
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             if (uc != null) {
                 uc.disconnect();
             }
         }
-
         return resBody;
     }
 
-    /**
-     * Allows callers of BasicHttpClient to obtain information about the
-     * response
-     * 
-     * @return
-     */
-    public HttpURLConnection getConnection() {
-        return uc;
+    protected String readInputStream() {
+        InputStream in = null;
+        String response = null;
+        try {
+            in = uc.getInputStream();
+            boolean readComplete = false;
+            if (this.requestInterceptor != null) {
+                // Invoke interceptor
+                readComplete = this.requestInterceptor.onBeforeRead(uc);
+            }
+            if (!readComplete) {
+                response = read(in);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Try to read error stream
+            // response = readErrorStream();
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        return response;
+    }
+
+    protected String readErrorStream() {
+        String response = null;
+        InputStream err = uc.getErrorStream();
+        response = read(err);
+        return response;
+    }
+
+    protected void writeOutputStream(String content) {
+        OutputStream out = null;
+        try {
+            boolean writeComplete = false;
+            if (this.requestInterceptor != null) {
+                // Invoke interceptor
+                writeComplete = requestInterceptor.onBeforeWrite(uc, content);
+            }
+            if (!writeComplete) {
+                out = uc.getOutputStream();
+                out.write(content.getBytes(UTF8));
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } finally {
+            if (out != null) {
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     /**
@@ -205,7 +265,7 @@ public class BasicHttpClient {
      * 
      * @return
      */
-    private String getQueryString(Map<String, String> params) {
+    private String urlEncode(Map<String, String> params) {
         if (params == null) {
             return null;
         }
@@ -245,13 +305,19 @@ public class BasicHttpClient {
             return new Scanner(in).useDelimiter("\\A").next();
         } catch (java.util.NoSuchElementException e) {
             return "";
-        } finally {
-            if (in != null)
-                try {
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+        }
+    }
+
+    public void setRequestInterceptor(RequestInterceptor interceptor) {
+        this.requestInterceptor = interceptor;
+    }
+
+    private void logHeaders(Map<String, List<String>> map) {
+        for (String field : map.keySet()) {
+            List<String> headers = map.get(field);
+            for (String header : headers) {
+                Log.i(TAG, field + ":" + header);
+            }
         }
     }
 
