@@ -1,6 +1,6 @@
 package com.turbomanage.android.http;
 
-public enum HttpMethod {
+public enum RequestMethod {
     GET(false),
     POST(true),
     PUT(true),
@@ -8,7 +8,7 @@ public enum HttpMethod {
     
     private boolean doOutput;
     
-    HttpMethod(boolean doOutput) {
+    RequestMethod(boolean doOutput) {
         this.doOutput = doOutput;
     }
     

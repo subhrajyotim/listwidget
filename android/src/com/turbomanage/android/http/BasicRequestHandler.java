@@ -39,19 +39,13 @@ public class BasicRequestHandler implements RequestHandler {
      * Sets request properties based on the request method. Override this method to modify 
      * or set additional properties.
      * 
-     * @see com.turbomanage.android.http.RequestHandler#prepareConnection(java.net.HttpURLConnection, com.turbomanage.android.http.HttpMethod, java.lang.String)
+     * @see com.turbomanage.android.http.RequestHandler#prepareConnection(java.net.HttpURLConnection)
      */
     @Override
-    public void prepareConnection(HttpURLConnection urlConnection, HttpMethod httpMethod,
-            String contentType) throws IOException {
+    public void prepareConnection(HttpURLConnection urlConnection) throws IOException {
         urlConnection.setRequestProperty("Accept-Charset", UTF8);
         // TODO Make this configurable
         urlConnection.setReadTimeout(2000);
-        urlConnection.setRequestMethod(httpMethod.getMethodName());
-        urlConnection.setDoOutput(httpMethod.getDoOutput());
-        if (contentType != null) {
-            urlConnection.setRequestProperty("Content-Type", contentType);
-        }
     }
 
     /**

@@ -8,6 +8,7 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -31,8 +32,13 @@ public abstract class AbstractHttpClient {
     public static final String MULTIPART = "multipart/form-data";
 
     protected String baseUrl;
-    private RequestHandler requestHandler;
+    
     private RequestLogger requestLogger;
+    private HttpErrorHandler httpErrorHandler;
+    private HttpOpener httpOpener;
+    private HttpPreparer httpPreparer;
+    private HttpReader httpReader;
+    private HttpWriter httpWriter;
 
     /**
      * Constructs a new client with base URL that will be appended in the 
@@ -56,6 +62,8 @@ public abstract class AbstractHttpClient {
     /**
      * Execute a GET request and return the response.
      * 
+     * The supplied parameters are URL encoded and sent as the query string.
+     * 
      * @param path
      * @param params
      * @return Response object
@@ -63,25 +71,40 @@ public abstract class AbstractHttpClient {
     public abstract Object get(String path, Map<String, String> params);
 
     /**
-     * Execute a POST request and return the response.
+     * Execute a POST request with parameter map and return the response.
      * 
      * @param path
      * @param params
-     * @return
+     * @return Response object
      */
     public abstract Object post(String path, Map<String, String> params);
+
+    /**
+     * Execute a POST request with a chunk of data.
+     * 
+     * The supplied parameters are URL encoded and sent as the request content.
+     * 
+     * @param path
+     * @param contentType
+     * @param data
+     * @return Response object
+     */
+    public abstract Object post(String path, String contentType, Object data);
 
     /**
      * Execute a PUT request with the supplied content and return the response.
      * 
      * @param path
-     * @param content
+     * @param contentType
+     * @param data
      * @return Response object
      */
-    public abstract Object put(String path, Object content);
+    public abstract Object put(String path, String contentType, Object data);
 
     /**
      * Execute a DELETE request and return the response.
+     * 
+     * The supplied parameters are URL encoded and sent as the query string.
      * 
      * @param path
      * @param params
@@ -93,31 +116,32 @@ public abstract class AbstractHttpClient {
      * Executes a request.
      * 
      * @param path Part of the URL after the host & port
-     * @param httpMethod Request method
+     * @param requestMethod Request method
      * @param contentType MIME type of the request
      * @param content Request data
      * @return Response object
      */
-    protected Object doHttpMethod(String path, HttpMethod httpMethod, String contentType, Object content) {
+    protected Object doHttpMethod(String path, RequestMethod requestMethod, String contentType, Object content) {
     
         HttpURLConnection uc = null;
         Object response = null;
     
         try {
             uc = openConnection(path);
-            prepareConnection(uc, httpMethod, contentType);
+            setRequestMethod(uc, requestMethod, contentType);
+            prepareConnection(uc);
             if (requestLogger.isLoggingEnabled()) {
                 requestLogger.logRequest(uc, content);
             }
             if (uc.getDoOutput() && content != null) {
+                int status = writeOutputStream(uc, content);
             }
-            int status = writeOutputStream(uc, content);
             response = readInputStream(uc);
             if (requestLogger.isLoggingEnabled()) {
                 requestLogger.logResponse(uc);
             }
         } catch (IOException e) {
-            requestHandler.onError(uc, e);
+            httpErrorHandler.onError(uc, e);
         } finally {
             if (uc != null) {
                 uc.disconnect();
@@ -130,11 +154,28 @@ public abstract class AbstractHttpClient {
         if (!path.startsWith("/")) {
             throw new IllegalArgumentException("path must start with /");
         }
-        return requestHandler.openConnection(baseUrl + path);
+        return httpOpener.openConnection(baseUrl + path);
     }
 
-    protected void prepareConnection(HttpURLConnection urlConnection, HttpMethod httpMethod, String contentType) throws IOException {
-        requestHandler.prepareConnection(urlConnection, httpMethod, contentType);
+    /**
+     * Sets the request properties associated with the request method and content type. 
+     * 
+     * @param urlConnection
+     * @param requestMethod
+     * @param contentType
+     * @throws ProtocolException
+     */
+    protected void setRequestMethod(HttpURLConnection urlConnection, RequestMethod requestMethod,
+            String contentType) throws ProtocolException {
+        urlConnection.setRequestMethod(requestMethod.getMethodName());
+        urlConnection.setDoOutput(requestMethod.getDoOutput());
+        if (contentType != null) {
+            urlConnection.setRequestProperty("Content-Type", contentType);
+        }
+    }
+
+    protected void prepareConnection(HttpURLConnection urlConnection) throws IOException {
+        httpPreparer.prepareConnection(urlConnection);
     }
 
     protected int writeOutputStream(HttpURLConnection uc, Object content) throws IOException {
@@ -142,7 +183,7 @@ public abstract class AbstractHttpClient {
         try {
             out = uc.getOutputStream();
             if (out != null) {
-                requestHandler.writeStream(out, content);
+                httpWriter.writeStream(out, content);
             }
             return uc.getResponseCode();
         } finally {
@@ -162,7 +203,7 @@ public abstract class AbstractHttpClient {
         try {
             in = uc.getInputStream();
             if (in != null) {
-                response = requestHandler.readStream(in);
+                response = httpReader.readStream(in);
             }
         } finally {
             if (in != null) {
@@ -218,22 +259,28 @@ public abstract class AbstractHttpClient {
         return (CookieManager) CookieHandler.getDefault();
     }
 
-    /**
-     * Setter for the {@link RequestHandler}.
-     *  
-     * @param handler
-     */
-    public void setRequestHandler(RequestHandler handler) {
-        this.requestHandler = handler;
-    }
-
-    /**
-     * Setter for the {@link RequestLogger}.
-     * 
-     * @param logger
-     */
     public void setRequestLogger(RequestLogger logger) {
         this.requestLogger = logger;
+    }
+
+    public void setHttpErrorHandler(HttpErrorHandler httpErrorHandler) {
+        this.httpErrorHandler = httpErrorHandler;
+    }
+
+    public void setHttpOpener(HttpOpener httpOpener) {
+        this.httpOpener = httpOpener;
+    }
+
+    public void setHttpPreparer(HttpPreparer httpPreparer) {
+        this.httpPreparer = httpPreparer;
+    }
+
+    public void setHttpReader(HttpReader httpReader) {
+        this.httpReader = httpReader;
+    }
+
+    public void setHttpWriter(HttpWriter httpWriter) {
+        this.httpWriter = httpWriter;
     }
 
     /**
