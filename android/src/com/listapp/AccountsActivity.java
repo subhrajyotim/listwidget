@@ -35,6 +35,8 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.turbomanage.android.http.BasicHttpClient;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -207,19 +209,16 @@ public class AccountsActivity extends Activity {
                                 public void run(AccountManagerFuture<Bundle> future) {
                                     String authToken = getAuthToken(future);
                                     // Ensure the token is not expired by
-                                    // invalidating it and
-                                    // obtaining a new one
+                                    // invalidating it and obtaining a new one
                                     mgr.invalidateAuthToken(account.type, authToken);
                                     mgr.getAuthToken(account, "ah", null, activity,
                                             new AccountManagerCallback<Bundle>() {
                                                 public void run(AccountManagerFuture<Bundle> future) {
                                                     String authToken = getAuthToken(future);
-                                                    // Convert the token into a
-                                                    // cookie for future use
+                                                    // Convert the token into a cookie for future use
                                                     loginProd(authToken);
                                                     // TODO put back when ready
-                                                    // C2DMessaging.register(mContext,
-                                                    // Setup.SENDER_ID);
+                                                    // C2DMessaging.register(mContext, Setup.SENDER_ID);
                                                 }
                                             }, null);
                                 }
@@ -232,12 +231,11 @@ public class AccountsActivity extends Activity {
 
     public void loginDev(String userEmail) {
         BasicHttpClient httpClient = new BasicHttpClient(Util.getBaseUrl(this));
-        httpClient.setRequestInterceptor(new RequestLogger());
         Map<String, String> params = httpClient.newQueryParams();
         params.put("continue", "/");
         params.put("email", userEmail);
         params.put("action", "Log In");
-        String res = httpClient.post("/_ah/login", params);
+        httpClient.post("/_ah/login", params);
     }
 
     public void loginProd(String authToken) {
