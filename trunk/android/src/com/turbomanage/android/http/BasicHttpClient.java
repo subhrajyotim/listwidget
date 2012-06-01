@@ -18,13 +18,21 @@ package com.turbomanage.android.http;
 public class BasicHttpClient extends AbstractHttpClient {
 
     /**
+     * Constructs a new client with empty baseUrl. When used this way, the path passed
+     * to a request method must be the complete URL.
+     */
+    public BasicHttpClient() {
+        this("");
+    }
+
+    /**
      * Constructs a new client using the default {@link RequestHandler} and
      * {@link RequestLogger}.
      */
     public BasicHttpClient(String baseUrl) {
         super(baseUrl);
         setRequestHandler(new AbstractRequestHandler() {});
-        setRequestLogger(new BasicRequestLogger());
+        setRequestLogger(new ConsoleRequestLogger());
     }
 
     /* (non-Javadoc)

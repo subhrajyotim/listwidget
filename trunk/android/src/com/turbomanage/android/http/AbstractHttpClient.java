@@ -37,20 +37,16 @@ public abstract class AbstractHttpClient {
 
     /**
      * Constructs a new client with base URL that will be appended in the 
-     * request methods. Example: http://turbomanage.com:80
+     * request methods. It may be empty or any part of a URL.
+     * 
+     * Examples: 
+     * http://turbomanage.com
+     * http://turbomanage.com:987
+     * http://turbomanage.com:987/resources
      * 
      * @param baseUrl
      */
     public AbstractHttpClient(String baseUrl) {
-        if (baseUrl.endsWith("/")) {
-            // Strip trailing slash
-            baseUrl = baseUrl.substring(0, baseUrl.length()-1);
-        }
-        try {
-            new URL(baseUrl);
-        } catch (MalformedURLException e) {
-            throw new IllegalArgumentException(baseUrl + " is not a valid URL", e);
-        }
         this.baseUrl = baseUrl;
     }
 
@@ -108,9 +104,11 @@ public abstract class AbstractHttpClient {
     public abstract HttpResponse delete(String path, ParameterMap params);
 
     /**
-     * Executes a request.
+     * This is the method that drives each request. It implements the request
+     * lifecycle defined as open, prepare, write, read. Each of these methods
+     * in turn delegates to the {@link RequestHandler} associated with this client.
      * 
-     * @param path Part of the URL after the host & port
+     * @param path Whole or partial URL string, will be appended to baseUrl
      * @param httpMethod Request method
      * @param contentType MIME type of the request
      * @param content Request data
@@ -146,10 +144,13 @@ public abstract class AbstractHttpClient {
     }
 
     protected HttpURLConnection openConnection(String path) throws IOException {
-        if (!path.startsWith("/")) {
-            throw new IllegalArgumentException("path must start with /");
+        String requestUrl = baseUrl + path;
+        try {
+            new URL(requestUrl);
+        } catch (MalformedURLException e) {
+            throw new IllegalArgumentException(requestUrl + " is not a valid URL", e);
         }
-        return requestHandler.openConnection(baseUrl + path);
+        return requestHandler.openConnection(requestUrl);
     }
 
     protected void prepareConnection(HttpURLConnection urlConnection, HttpMethod httpMethod,

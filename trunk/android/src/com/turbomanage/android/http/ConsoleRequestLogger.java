@@ -1,7 +1,5 @@
 package com.turbomanage.android.http;
 
-import android.util.Log;
-
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.List;
@@ -9,18 +7,19 @@ import java.util.Map;
 
 /**
  * Default {@link RequestLogger} used by {@link BasicHttpClient}.
+ * In recent versions of Android, System.out.println() gets directed to
+ * LogCat so this can work for Android, too.
+ * http://stackoverflow.com/questions/2220547/why-doesnt-system-out-println-work-in-android
  *  
  * @author David M. Chandler
  */
-public class BasicRequestLogger implements RequestLogger {
-
-    private static final String TAG = RequestLogger.class.getSimpleName();
+public class ConsoleRequestLogger implements RequestLogger {
 
     /* (non-Javadoc)
      * @see com.turbomanage.android.http.RequestLogger#isLoggingEnabled()
      */
     public boolean isLoggingEnabled() {
-        return Log.isLoggable(TAG, Log.INFO);
+        return true;
     }
 
     /* (non-Javadoc)
@@ -28,10 +27,10 @@ public class BasicRequestLogger implements RequestLogger {
      */
     @Override
     public void logRequest(HttpURLConnection uc, Object content) throws IOException {
-        Log.i(TAG, "=== HTTP Request ===");
-        Log.i(TAG, "send url: " + uc.getURL().toString());
+        System.out.println("=== HTTP Request ===");
+        System.out.println("send url: " + uc.getURL().toString());
         if (content instanceof String) {
-            Log.i(TAG, "Content: " + (String) content);
+            System.out.println("Content: " + (String) content);
         }
         logHeaders(uc.getRequestProperties());
     }
@@ -41,9 +40,9 @@ public class BasicRequestLogger implements RequestLogger {
      */
     @Override
     public void logResponse(HttpURLConnection uc) throws IOException {
-        Log.i(TAG, "=== HTTP Response ===");
-        Log.i(TAG, "receive url: " + uc.getURL().toString());
-        Log.i(TAG, "status: " + uc.getResponseCode());
+        System.out.println("=== HTTP Response ===");
+        System.out.println("receive url: " + uc.getURL().toString());
+        System.out.println("status: " + uc.getResponseCode());
         logHeaders(uc.getHeaderFields());
     }
 
@@ -56,7 +55,7 @@ public class BasicRequestLogger implements RequestLogger {
         for (String field : map.keySet()) {
             List<String> headers = map.get(field);
             for (String header : headers) {
-                Log.i(TAG, field + ":" + header);
+                System.out.println(field + ":" + header);
             }
         }
     }
