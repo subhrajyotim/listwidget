@@ -36,10 +36,11 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.turbomanage.android.http.BasicHttpClient;
+import com.turbomanage.android.http.HttpResponse;
+import com.turbomanage.android.http.ParameterMap;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Account selections activity - handles device registration and unregistration.
@@ -215,10 +216,12 @@ public class AccountsActivity extends Activity {
                                             new AccountManagerCallback<Bundle>() {
                                                 public void run(AccountManagerFuture<Bundle> future) {
                                                     String authToken = getAuthToken(future);
-                                                    // Convert the token into a cookie for future use
+                                                    // Convert the token into a
+                                                    // cookie for future use
                                                     loginProd(authToken);
                                                     // TODO put back when ready
-                                                    // C2DMessaging.register(mContext, Setup.SENDER_ID);
+                                                    // C2DMessaging.register(mContext,
+                                                    // Setup.SENDER_ID);
                                                 }
                                             }, null);
                                 }
@@ -231,17 +234,17 @@ public class AccountsActivity extends Activity {
 
     public void loginDev(String userEmail) {
         BasicHttpClient httpClient = new BasicHttpClient(Util.getBaseUrl(this));
-        Map<String, String> params = httpClient.newQueryParams();
-        params.put("continue", "/");
-        params.put("email", userEmail);
-        params.put("action", "Log In");
+        ParameterMap params = httpClient.newParams()
+                .add("continue", "/")
+                .add("email", userEmail)
+                .add("action", "Log In");
         httpClient.post("/_ah/login", params);
     }
 
     public void loginProd(String authToken) {
         BasicHttpClient httpClient = new BasicHttpClient(Util.getBaseUrl(this));
-        Map<String, String> params = httpClient.newQueryParams();
-        params.put("auth", authToken);
+        ParameterMap params = httpClient.newParams()
+                .add("auth", authToken);
         httpClient.get("/_ah/login", params);
     }
 
