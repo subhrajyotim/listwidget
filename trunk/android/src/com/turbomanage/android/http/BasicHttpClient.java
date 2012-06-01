@@ -1,85 +1,82 @@
 
 package com.turbomanage.android.http;
 
-import java.util.Map;
 
 /**
- * Basic HTTP client that facilitates simple GET, POST, PUT, and DELETE requests. To handle 
- * response types other than String, extend {@link AbstractHttpClient} instead of this class.
- * To implement buffering, streaming, or set other request properties, set an alternate 
+ * Basic HTTP client that facilitates simple GET, POST, PUT, and DELETE
+ * requests. To handle response types other than String, extend
+ * {@link AbstractHttpClient} instead of this class. To implement buffering,
+ * streaming, or set other request properties, set an alternate
  * {@link RequestHandler}.
  * 
  * @author David M. Chandler
+ */
+/**
+ * @author David M. Chandler
+ *
  */
 public class BasicHttpClient extends AbstractHttpClient {
 
     /**
      * Constructs a new client using the default {@link RequestHandler} and
      * {@link RequestLogger}.
-     * 
-     * @see AbstractHttpClient
      */
     public BasicHttpClient(String baseUrl) {
         super(baseUrl);
-        RequestHandler defaultRequestHandler = new BasicRequestHandler();
-        setHttpErrorHandler(defaultRequestHandler);
-        setHttpOpener(defaultRequestHandler);
-        setHttpPreparer(defaultRequestHandler);
-        setHttpReader(defaultRequestHandler);
-        setHttpWriter(defaultRequestHandler);
+        setRequestHandler(new AbstractRequestHandler() {});
         setRequestLogger(new BasicRequestLogger());
     }
 
     /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#get(java.lang.String, java.util.Map)
+     * @see com.turbomanage.android.http.AbstractHttpClient#get(java.lang.String, com.turbomanage.android.http.ParameterMap)
      */
     @Override
-    public String get(String path, Map<String, String> params) {
+    public HttpResponse get(String path, ParameterMap params) {
         String queryString = null;
         if (params != null) {
-            queryString = urlEncode(params);
+            queryString = params.urlEncode();
         }
-        return doHttpMethod(path + "?" + queryString, RequestMethod.GET, null, null).toString();
+        return doHttpMethod(path + "?" + queryString, HttpMethod.GET, null, null);
     }
 
     /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#post(java.lang.String, java.util.Map)
+     * @see com.turbomanage.android.http.AbstractHttpClient#post(java.lang.String, com.turbomanage.android.http.ParameterMap)
      */
     @Override
-    public String post(String path, Map<String, String> params) {
-        String data = null;
+    public HttpResponse post(String path, ParameterMap params) {
+        byte[] data = null;
         if (params != null) {
-            data = urlEncode(params);
+            data = params.urlEncodedBytes();
         }
-        return doHttpMethod(path, RequestMethod.POST, URLENCODED, data).toString();
+        return doHttpMethod(path, HttpMethod.POST, URLENCODED, data);
     }
 
     /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#post(java.lang.String, byte[], java.lang.String)
+     * @see com.turbomanage.android.http.AbstractHttpClient#post(java.lang.String, java.lang.String, byte[])
      */
     @Override
-    public Object post(String path, String contentType, Object data) {
-        return doHttpMethod(path, RequestMethod.POST, contentType, data);
+    public HttpResponse post(String path, String contentType, byte[] data) {
+        return doHttpMethod(path, HttpMethod.POST, contentType, data);
     }
 
     /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#put(java.lang.String, byte[], java.lang.String)
+     * @see com.turbomanage.android.http.AbstractHttpClient#put(java.lang.String, java.lang.String, byte[])
      */
     @Override
-    public Object put(String path, String contentType, Object data) {
-        return doHttpMethod(path, RequestMethod.PUT, contentType, data);
+    public HttpResponse put(String path, String contentType, byte[] data) {
+        return doHttpMethod(path, HttpMethod.PUT, contentType, data);
     }
 
     /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#delete(java.lang.String, java.util.Map)
+     * @see com.turbomanage.android.http.AbstractHttpClient#delete(java.lang.String, com.turbomanage.android.http.ParameterMap)
      */
     @Override
-    public String delete(String path, Map<String, String> params) {
+    public HttpResponse delete(String path, ParameterMap params) {
         String queryString = null;
         if (params != null) {
-            queryString = urlEncode(params);
+            queryString = params.urlEncode();
         }
-        return doHttpMethod(path + queryString, RequestMethod.DELETE, null, null).toString();
+        return doHttpMethod(path + queryString, HttpMethod.DELETE, null, null);
     }
 
 }

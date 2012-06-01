@@ -8,11 +8,9 @@ import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Lightweight HTTP client that facilitates GET, POST, PUT, and DELETE requests using
@@ -34,11 +32,8 @@ public abstract class AbstractHttpClient {
     protected String baseUrl;
     
     private RequestLogger requestLogger;
-    private HttpErrorHandler httpErrorHandler;
-    private HttpOpener httpOpener;
-    private HttpPreparer httpPreparer;
-    private HttpReader httpReader;
-    private HttpWriter httpWriter;
+    private RequestHandler requestHandler;
+    private Map<String, String> requestHeaders = new TreeMap<String, String>();
 
     /**
      * Constructs a new client with base URL that will be appended in the 
@@ -68,7 +63,7 @@ public abstract class AbstractHttpClient {
      * @param params
      * @return Response object
      */
-    public abstract Object get(String path, Map<String, String> params);
+    public abstract HttpResponse get(String path, ParameterMap params);
 
     /**
      * Execute a POST request with parameter map and return the response.
@@ -77,7 +72,7 @@ public abstract class AbstractHttpClient {
      * @param params
      * @return Response object
      */
-    public abstract Object post(String path, Map<String, String> params);
+    public abstract HttpResponse post(String path, ParameterMap params);
 
     /**
      * Execute a POST request with a chunk of data.
@@ -89,7 +84,7 @@ public abstract class AbstractHttpClient {
      * @param data
      * @return Response object
      */
-    public abstract Object post(String path, String contentType, Object data);
+    public abstract HttpResponse post(String path, String contentType, byte[] data);
 
     /**
      * Execute a PUT request with the supplied content and return the response.
@@ -99,7 +94,7 @@ public abstract class AbstractHttpClient {
      * @param data
      * @return Response object
      */
-    public abstract Object put(String path, String contentType, Object data);
+    public abstract HttpResponse put(String path, String contentType, byte[] data);
 
     /**
      * Execute a DELETE request and return the response.
@@ -110,80 +105,77 @@ public abstract class AbstractHttpClient {
      * @param params
      * @return Response object
      */
-    public abstract Object delete(String path, Map<String, String> params);
+    public abstract HttpResponse delete(String path, ParameterMap params);
 
     /**
      * Executes a request.
      * 
      * @param path Part of the URL after the host & port
-     * @param requestMethod Request method
+     * @param httpMethod Request method
      * @param contentType MIME type of the request
      * @param content Request data
      * @return Response object
      */
-    protected Object doHttpMethod(String path, RequestMethod requestMethod, String contentType, Object content) {
+    protected HttpResponse doHttpMethod(String path, HttpMethod httpMethod, String contentType, byte[] content) {
     
         HttpURLConnection uc = null;
-        Object response = null;
+        HttpResponse httpResponse = null;
     
         try {
             uc = openConnection(path);
-            setRequestMethod(uc, requestMethod, contentType);
-            prepareConnection(uc);
+            prepareConnection(uc, httpMethod, contentType);
+            appendRequestHeaders(uc);
             if (requestLogger.isLoggingEnabled()) {
                 requestLogger.logRequest(uc, content);
             }
             if (uc.getDoOutput() && content != null) {
                 int status = writeOutputStream(uc, content);
             }
-            response = readInputStream(uc);
+            httpResponse = readInputStream(uc);
             if (requestLogger.isLoggingEnabled()) {
                 requestLogger.logResponse(uc);
             }
         } catch (IOException e) {
-            httpErrorHandler.onError(uc, e);
+            requestHandler.onError(uc, e);
         } finally {
             if (uc != null) {
                 uc.disconnect();
             }
         }
-        return response;
+        return httpResponse;
     }
 
     protected HttpURLConnection openConnection(String path) throws IOException {
         if (!path.startsWith("/")) {
             throw new IllegalArgumentException("path must start with /");
         }
-        return httpOpener.openConnection(baseUrl + path);
+        return requestHandler.openConnection(baseUrl + path);
+    }
+
+    protected void prepareConnection(HttpURLConnection urlConnection, HttpMethod httpMethod,
+            String contentType) throws IOException {
+        requestHandler.prepareConnection(urlConnection, httpMethod, contentType);
     }
 
     /**
-     * Sets the request properties associated with the request method and content type. 
+     * Append all headers added with {@link #addHeader(String, String)}
+     * to the request.
      * 
      * @param urlConnection
-     * @param requestMethod
-     * @param contentType
-     * @throws ProtocolException
      */
-    protected void setRequestMethod(HttpURLConnection urlConnection, RequestMethod requestMethod,
-            String contentType) throws ProtocolException {
-        urlConnection.setRequestMethod(requestMethod.getMethodName());
-        urlConnection.setDoOutput(requestMethod.getDoOutput());
-        if (contentType != null) {
-            urlConnection.setRequestProperty("Content-Type", contentType);
+    private void appendRequestHeaders(HttpURLConnection urlConnection) {
+        for (String name : requestHeaders.keySet()) {
+            String value = requestHeaders.get(name);
+            urlConnection.setRequestProperty(name, value);
         }
     }
 
-    protected void prepareConnection(HttpURLConnection urlConnection) throws IOException {
-        httpPreparer.prepareConnection(urlConnection);
-    }
-
-    protected int writeOutputStream(HttpURLConnection uc, Object content) throws IOException {
+    protected int writeOutputStream(HttpURLConnection uc, byte[] content) throws IOException {
         OutputStream out = null;
         try {
             out = uc.getOutputStream();
             if (out != null) {
-                httpWriter.writeStream(out, content);
+                requestHandler.writeStream(out, content);
             }
             return uc.getResponseCode();
         } finally {
@@ -197,14 +189,15 @@ public abstract class AbstractHttpClient {
         }
     }
 
-    protected Object readInputStream(HttpURLConnection uc) throws IOException {
+    protected HttpResponse readInputStream(HttpURLConnection uc) throws IOException {
         InputStream in = null;
-        Object response = null;
+        byte[] responseBody = null;
         try {
             in = uc.getInputStream();
             if (in != null) {
-                response = httpReader.readStream(in);
+                responseBody = requestHandler.readStream(in);
             }
+            return new HttpResponse(uc, responseBody);
         } finally {
             if (in != null) {
                 try {
@@ -214,40 +207,45 @@ public abstract class AbstractHttpClient {
                 }
             }
         }
-        return response;
     }
 
     /**
-     * Convenience method creates a Map to hold query params
+     * Convenience method creates a new ParameterMap to hold query params
      * 
-     * @return Map queryParams
+     * @return Parameter map
      */
-    public Map<String, String> newQueryParams() {
-        return new HashMap<String, String>();
+    public ParameterMap newParams() {
+        return new ParameterMap();
     }
 
     /**
-     * Returns URL encoded data
+     * Adds to the headers that will be sent with each request from this client instance.
+     * The request headers added with this method are applied by calling 
+     * {@link HttpURLConnection#setRequestProperty(String, String)} 
+     * after {@link #prepareConnection(HttpURLConnection, HttpMethod, String)}, so they may
+     * supplement or replace headers which have already been set.
+     *   
+     * Calls to {@link #addHeader(String, String)} may be chained.
      * 
+     * To clear all headers added with this method, call {@link #clearHeaders()}.
+     * 
+     * @param name
+     * @param value
      * @return
      */
-    public String urlEncode(Map<String, String> params) {
-        if (params == null) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (String key : params.keySet()) {
-            if (sb.length() > 0) {
-                sb.append("&");
-            }
-            sb.append(key);
-            String value = params.get(key);
-            if (value != null) {
-                sb.append("=");
-                sb.append(URLEncoder.encode(value));
-            }
-        }
-        return sb.toString();
+    public AbstractHttpClient addHeader(String name, String value) {
+        requestHeaders.put(name, value);
+        return this;
+    }
+    
+    /**
+     * Clears all request headers that have been added using 
+     * {@link #addHeader(String, String)}. This method has no effect on
+     * headers which result from request properties set by this class or its
+     * associated {@link RequestHandler} when preparing the {@link HttpURLConnection}.
+     */
+    public void clearHeaders() {
+        requestHeaders.clear();
     }
 
     /**
@@ -263,24 +261,8 @@ public abstract class AbstractHttpClient {
         this.requestLogger = logger;
     }
 
-    public void setHttpErrorHandler(HttpErrorHandler httpErrorHandler) {
-        this.httpErrorHandler = httpErrorHandler;
-    }
-
-    public void setHttpOpener(HttpOpener httpOpener) {
-        this.httpOpener = httpOpener;
-    }
-
-    public void setHttpPreparer(HttpPreparer httpPreparer) {
-        this.httpPreparer = httpPreparer;
-    }
-
-    public void setHttpReader(HttpReader httpReader) {
-        this.httpReader = httpReader;
-    }
-
-    public void setHttpWriter(HttpWriter httpWriter) {
-        this.httpWriter = httpWriter;
+    public void setRequestHandler(RequestHandler requestHandler) {
+        this.requestHandler = requestHandler;
     }
 
     /**
