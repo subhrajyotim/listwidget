@@ -29,11 +29,17 @@ public class HttpResponse {
     public int getStatus() {
         return status;
     }
+    
     public Map<String, List<String>> getHeaders() {
         return headers;
     }
+    
     public byte[] getBody() {
         return body;
+    }
+
+    public String getBodyAsString() {
+        return new String(body);
     }
     
 }

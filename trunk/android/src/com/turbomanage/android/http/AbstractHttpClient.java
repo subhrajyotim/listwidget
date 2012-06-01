@@ -51,59 +51,6 @@ public abstract class AbstractHttpClient {
     }
 
     /**
-     * Execute a GET request and return the response.
-     * 
-     * The supplied parameters are URL encoded and sent as the query string.
-     * 
-     * @param path
-     * @param params
-     * @return Response object
-     */
-    public abstract HttpResponse get(String path, ParameterMap params);
-
-    /**
-     * Execute a POST request with parameter map and return the response.
-     * 
-     * @param path
-     * @param params
-     * @return Response object
-     */
-    public abstract HttpResponse post(String path, ParameterMap params);
-
-    /**
-     * Execute a POST request with a chunk of data.
-     * 
-     * The supplied parameters are URL encoded and sent as the request content.
-     * 
-     * @param path
-     * @param contentType
-     * @param data
-     * @return Response object
-     */
-    public abstract HttpResponse post(String path, String contentType, byte[] data);
-
-    /**
-     * Execute a PUT request with the supplied content and return the response.
-     * 
-     * @param path
-     * @param contentType
-     * @param data
-     * @return Response object
-     */
-    public abstract HttpResponse put(String path, String contentType, byte[] data);
-
-    /**
-     * Execute a DELETE request and return the response.
-     * 
-     * The supplied parameters are URL encoded and sent as the query string.
-     * 
-     * @param path
-     * @param params
-     * @return Response object
-     */
-    public abstract HttpResponse delete(String path, ParameterMap params);
-
-    /**
      * This is the method that drives each request. It implements the request
      * lifecycle defined as open, prepare, write, read. Each of these methods
      * in turn delegates to the {@link RequestHandler} associated with this client.

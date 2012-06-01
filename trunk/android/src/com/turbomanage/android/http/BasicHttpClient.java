@@ -35,10 +35,15 @@ public class BasicHttpClient extends AbstractHttpClient {
         setRequestLogger(new ConsoleRequestLogger());
     }
 
-    /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#get(java.lang.String, com.turbomanage.android.http.ParameterMap)
+    /**
+     * Execute a GET request and return the response.
+     * 
+     * The supplied parameters are URL encoded and sent as the query string.
+     * 
+     * @param path
+     * @param params
+     * @return Response object
      */
-    @Override
     public HttpResponse get(String path, ParameterMap params) {
         String queryString = null;
         if (params != null) {
@@ -47,38 +52,57 @@ public class BasicHttpClient extends AbstractHttpClient {
         return doHttpMethod(path + "?" + queryString, HttpMethod.GET, null, null);
     }
 
-    /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#post(java.lang.String, com.turbomanage.android.http.ParameterMap)
+    /**
+     * Execute a POST request with parameter map and return the response.
+     * 
+     * @param path
+     * @param params
+     * @return Response object
      */
-    @Override
     public HttpResponse post(String path, ParameterMap params) {
-        byte[] data = null;
-        if (params != null) {
-            data = params.urlEncodedBytes();
-        }
-        return doHttpMethod(path, HttpMethod.POST, URLENCODED, data);
+//        byte[] data = null;
+//        if (params != null) {
+//            data = params.urlEncodedBytes();
+//        }
+//        return doHttpMethod(path, HttpMethod.POST, URLENCODED, data);
+        return new HttpPostRequest(this, path, params).execute();
     }
 
-    /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#post(java.lang.String, java.lang.String, byte[])
+    /**
+     * Execute a POST request with a chunk of data.
+     * 
+     * The supplied parameters are URL encoded and sent as the request content.
+     * 
+     * @param path
+     * @param contentType
+     * @param data
+     * @return Response object
      */
-    @Override
     public HttpResponse post(String path, String contentType, byte[] data) {
         return doHttpMethod(path, HttpMethod.POST, contentType, data);
     }
 
-    /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#put(java.lang.String, java.lang.String, byte[])
+    /**
+     * Execute a PUT request with the supplied content and return the response.
+     * 
+     * @param path
+     * @param contentType
+     * @param data
+     * @return Response object
      */
-    @Override
     public HttpResponse put(String path, String contentType, byte[] data) {
         return doHttpMethod(path, HttpMethod.PUT, contentType, data);
     }
 
-    /* (non-Javadoc)
-     * @see com.turbomanage.android.http.AbstractHttpClient#delete(java.lang.String, com.turbomanage.android.http.ParameterMap)
+    /**
+     * Execute a DELETE request and return the response.
+     * 
+     * The supplied parameters are URL encoded and sent as the query string.
+     * 
+     * @param path
+     * @param params
+     * @return Response object
      */
-    @Override
     public HttpResponse delete(String path, ParameterMap params) {
         String queryString = null;
         if (params != null) {
