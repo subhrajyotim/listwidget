@@ -45,11 +45,7 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse get(String path, ParameterMap params) {
-        String queryString = null;
-        if (params != null) {
-            queryString = params.urlEncode();
-        }
-        return doHttpMethod(path + "?" + queryString, HttpMethod.GET, null, null);
+        return new HttpGetRequest(this, path, params).execute();
     }
 
     /**
@@ -60,11 +56,6 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse post(String path, ParameterMap params) {
-//        byte[] data = null;
-//        if (params != null) {
-//            data = params.urlEncodedBytes();
-//        }
-//        return doHttpMethod(path, HttpMethod.POST, URLENCODED, data);
         return new HttpPostRequest(this, path, params).execute();
     }
 
@@ -79,7 +70,7 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse post(String path, String contentType, byte[] data) {
-        return doHttpMethod(path, HttpMethod.POST, contentType, data);
+        return new HttpPostRequest(this, path, contentType, data).execute();
     }
 
     /**
@@ -91,7 +82,7 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse put(String path, String contentType, byte[] data) {
-        return doHttpMethod(path, HttpMethod.PUT, contentType, data);
+        return new HttpPutRequest(this, path, contentType, data).execute();
     }
 
     /**
@@ -104,11 +95,7 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse delete(String path, ParameterMap params) {
-        String queryString = null;
-        if (params != null) {
-            queryString = params.urlEncode();
-        }
-        return doHttpMethod(path + queryString, HttpMethod.DELETE, null, null);
+        return new HttpDeleteRequest(this, path, params).execute();
     }
 
 }
