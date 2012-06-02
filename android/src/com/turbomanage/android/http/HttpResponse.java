@@ -13,12 +13,14 @@ import java.util.Map;
 public class HttpResponse {
     
     private int status;
+    private String url;
     private Map<String, List<String>> headers;
     private byte[] body;
     
     public HttpResponse(HttpURLConnection urlConnection, byte[] body) {
         try {
             this.status = urlConnection.getResponseCode();
+            this.url = urlConnection.getURL().toString();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -30,6 +32,10 @@ public class HttpResponse {
         return status;
     }
     
+    public String getUrl() {
+        return url;
+    }
+
     public Map<String, List<String>> getHeaders() {
         return headers;
     }
@@ -39,7 +45,10 @@ public class HttpResponse {
     }
 
     public String getBodyAsString() {
-        return new String(body);
+        if (body != null) {
+            return new String(body);
+        }
+        return null;
     }
     
 }

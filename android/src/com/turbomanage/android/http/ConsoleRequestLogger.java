@@ -1,3 +1,4 @@
+
 package com.turbomanage.android.http;
 
 import java.io.IOException;
@@ -6,24 +7,28 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Default {@link RequestLogger} used by {@link BasicHttpClient}.
- * In recent versions of Android, System.out.println() gets directed to
- * LogCat so this can work for Android, too.
- * http://stackoverflow.com/questions/2220547/why-doesnt-system-out-println-work-in-android
- *  
+ * Default {@link RequestLogger} used by {@link BasicHttpClient}. In recent
+ * versions of Android, System.out.println() gets directed to LogCat so this can
+ * work for Android, too.
+ * http://stackoverflow.com/questions/2220547/why-doesnt-system
+ * -out-println-work-in-android
+ * 
  * @author David M. Chandler
  */
 public class ConsoleRequestLogger implements RequestLogger {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
      * @see com.turbomanage.android.http.RequestLogger#isLoggingEnabled()
      */
     public boolean isLoggingEnabled() {
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see com.turbomanage.android.http.RequestLogger#logRequest(java.net.HttpURLConnection, java.lang.Object)
+    /*
+     * (non-Javadoc)
+     * @see com.turbomanage.android.http.RequestLogger#logRequest(java.net.
+     * HttpURLConnection, java.lang.Object)
      */
     @Override
     public void logRequest(HttpURLConnection uc, Object content) throws IOException {
@@ -35,15 +40,20 @@ public class ConsoleRequestLogger implements RequestLogger {
         logHeaders(uc.getRequestProperties());
     }
 
-    /* (non-Javadoc)
-     * @see com.turbomanage.android.http.RequestLogger#logResponse(java.net.HttpURLConnection)
+    /*
+     * (non-Javadoc)
+     * @see com.turbomanage.android.http.RequestLogger#logResponse(java.net.
+     * HttpURLConnection)
      */
     @Override
-    public void logResponse(HttpURLConnection uc) throws IOException {
-        System.out.println("=== HTTP Response ===");
-        System.out.println("receive url: " + uc.getURL().toString());
-        System.out.println("status: " + uc.getResponseCode());
-        logHeaders(uc.getHeaderFields());
+    public void logResponse(HttpResponse res) {
+        if (res != null) {
+            System.out.println("=== HTTP Response ===");
+            System.out.println("receive url: " + res.getUrl());
+            System.out.println("status: " + res.getStatus());
+            logHeaders(res.getHeaders());
+            System.out.println("Content:\n" + res.getBodyAsString());
+        }
     }
 
     /**
@@ -52,10 +62,12 @@ public class ConsoleRequestLogger implements RequestLogger {
      * @param map
      */
     private void logHeaders(Map<String, List<String>> map) {
-        for (String field : map.keySet()) {
-            List<String> headers = map.get(field);
-            for (String header : headers) {
-                System.out.println(field + ":" + header);
+        if (map != null) {
+            for (String field : map.keySet()) {
+                List<String> headers = map.get(field);
+                for (String header : headers) {
+                    System.out.println(field + ":" + header);
+                }
             }
         }
     }

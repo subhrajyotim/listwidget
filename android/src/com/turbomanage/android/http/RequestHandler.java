@@ -4,7 +4,9 @@ package com.turbomanage.android.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 
 
 /**
@@ -66,11 +68,13 @@ public interface RequestHandler {
     byte[] readStream(InputStream in) throws IOException;
 
     /**
-     * Invoked for any {@link IOException}s.
+     * Invoked for any exceptions. Of particular interest are
+     * {@link ConnectException}
+     * {@link SocketTimeoutException}
      * 
-     * @param urlConnection The connection for which the error occurred
+     * @param httpResponse The response, may be null
      * @param e The exception that was thrown
      */
-    void onError(HttpURLConnection urlConnection, Exception e);
+    void onError(HttpResponse httpResponse, Exception e);
 
 }

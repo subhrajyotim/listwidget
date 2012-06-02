@@ -13,10 +13,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
- * Lightweight HTTP client that facilitates GET, POST, PUT, and DELETE requests using
- * {@link HttpURLConnection}. Extend this class to support specialized content and 
- * response types (see {@link BasicHttpClient} for an example). To enable streaming,
- * buffering, or other types of readers / writers, set an alternate {@link RequestHandler}.
+ * Lightweight HTTP client that facilitates GET, POST, PUT, and DELETE requests
+ * using {@link HttpURLConnection}. Extend this class to support specialized
+ * content and response types (see {@link BasicHttpClient} for an example). To
+ * enable streaming, buffering, or other types of readers / writers, set an
+ * alternate {@link RequestHandler}.
  * 
  * @author David M. Chandler
  */
@@ -30,17 +31,15 @@ public abstract class AbstractHttpClient {
     public static final String MULTIPART = "multipart/form-data";
 
     protected String baseUrl = "";
-    
+
     private RequestLogger requestLogger;
     private RequestHandler requestHandler;
     private Map<String, String> requestHeaders = new TreeMap<String, String>();
 
     /**
-     * Constructs a new client with base URL that will be appended in the 
-     * request methods. It may be empty or any part of a URL.
-     * 
-     * Examples: 
-     * http://turbomanage.com
+     * Constructs a new client with base URL that will be appended in the
+     * request methods. It may be empty or any part of a URL. Examples:
+     * http://turbomanage.com 
      * http://turbomanage.com:987
      * http://turbomanage.com:987/resources
      * 
@@ -52,8 +51,8 @@ public abstract class AbstractHttpClient {
 
     /**
      * This is the method that drives each request. It implements the request
-     * lifecycle defined as open, prepare, write, read. Each of these methods
-     * in turn delegates to the {@link RequestHandler} associated with this client.
+     * lifecycle defined as open, prepare, write, read. Each of these methods in
+     * turn delegates to the {@link RequestHandler} associated with this client.
      * 
      * @param path Whole or partial URL string, will be appended to baseUrl
      * @param httpMethod Request method
@@ -61,14 +60,17 @@ public abstract class AbstractHttpClient {
      * @param content Request data
      * @return Response object
      */
-    protected HttpResponse doHttpMethod(String path, HttpMethod httpMethod, String contentType, byte[] content) {
-    
+    protected HttpResponse doHttpMethod(String path, HttpMethod httpMethod, String contentType,
+            byte[] content) {
+
         HttpURLConnection uc = null;
         HttpResponse httpResponse = null;
-    
+
         try {
             uc = openConnection(path);
             prepareConnection(uc, httpMethod, contentType);
+            // TODO debug read timeout for GETs
+//            uc.setFixedLengthStreamingMode(10);
             appendRequestHeaders(uc);
             if (requestLogger.isLoggingEnabled()) {
                 requestLogger.logRequest(uc, content);
@@ -77,12 +79,18 @@ public abstract class AbstractHttpClient {
                 int status = writeOutputStream(uc, content);
             }
             httpResponse = readInputStream(uc);
-            if (requestLogger.isLoggingEnabled()) {
-                requestLogger.logResponse(uc);
+        } catch (Exception e) {
+            // Try reading the error stream to populate status code such as 404
+            try {
+                httpResponse = readErrorStream(uc);
+                requestHandler.onError(httpResponse, e);
+            } catch (Exception ee) {
+                // Swallow to show first cause only
             }
-        } catch (IOException e) {
-            requestHandler.onError(uc, e);
         } finally {
+            if (requestLogger.isLoggingEnabled()) {
+                requestLogger.logResponse(httpResponse);
+            }
             if (uc != null) {
                 uc.disconnect();
             }
@@ -106,8 +114,8 @@ public abstract class AbstractHttpClient {
     }
 
     /**
-     * Append all headers added with {@link #addHeader(String, String)}
-     * to the request.
+     * Append all headers added with {@link #addHeader(String, String)} to the
+     * request.
      * 
      * @param urlConnection
      */
@@ -118,6 +126,12 @@ public abstract class AbstractHttpClient {
         }
     }
 
+    /**
+     * @param uc
+     * @param content
+     * @return request status
+     * @throws IOException
+     */
     protected int writeOutputStream(HttpURLConnection uc, byte[] content) throws IOException {
         OutputStream out = null;
         try {
@@ -127,11 +141,14 @@ public abstract class AbstractHttpClient {
             }
             return uc.getResponseCode();
         } finally {
+            // TODO nested try-catch not necessary since method throws IOException
+            // May want to wrap & swallow to avoid dup exceptions
+            // Without a catch cause above, the close exception occurs before orig bubbles up
             if (out != null) {
                 try {
                     out.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    // Swallow it to avoid dups
                 }
             }
         }
@@ -150,8 +167,28 @@ public abstract class AbstractHttpClient {
             if (in != null) {
                 try {
                     in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    // Swallow to avoid dups
+                }
+            }
+        }
+    }
+
+    protected HttpResponse readErrorStream(HttpURLConnection uc) throws IOException {
+        InputStream err = null;
+        byte[] responseBody = null;
+        try {
+            err = uc.getErrorStream();
+            if (err != null) {
+                responseBody = requestHandler.readStream(err);
+            }
+            return new HttpResponse(uc, responseBody);
+        } finally {
+            if (err != null) {
+                try {
+                    err.close();
+                } catch (Exception e) {
+                    // Swallow to avoid dups
                 }
             }
         }
@@ -167,15 +204,13 @@ public abstract class AbstractHttpClient {
     }
 
     /**
-     * Adds to the headers that will be sent with each request from this client instance.
-     * The request headers added with this method are applied by calling 
-     * {@link HttpURLConnection#setRequestProperty(String, String)} 
-     * after {@link #prepareConnection(HttpURLConnection, HttpMethod, String)}, so they may
-     * supplement or replace headers which have already been set.
-     *   
-     * Calls to {@link #addHeader(String, String)} may be chained.
-     * 
-     * To clear all headers added with this method, call {@link #clearHeaders()}.
+     * Adds to the headers that will be sent with each request from this client
+     * instance. The request headers added with this method are applied by
+     * calling {@link HttpURLConnection#setRequestProperty(String, String)}
+     * after {@link #prepareConnection(HttpURLConnection, HttpMethod, String)},
+     * so they may supplement or replace headers which have already been set.
+     * Calls to {@link #addHeader(String, String)} may be chained. To clear all
+     * headers added with this method, call {@link #clearHeaders()}.
      * 
      * @param name
      * @param value
@@ -185,12 +220,12 @@ public abstract class AbstractHttpClient {
         requestHeaders.put(name, value);
         return this;
     }
-    
+
     /**
-     * Clears all request headers that have been added using 
-     * {@link #addHeader(String, String)}. This method has no effect on
-     * headers which result from request properties set by this class or its
-     * associated {@link RequestHandler} when preparing the {@link HttpURLConnection}.
+     * Clears all request headers that have been added using
+     * {@link #addHeader(String, String)}. This method has no effect on headers
+     * which result from request properties set by this class or its associated
+     * {@link RequestHandler} when preparing the {@link HttpURLConnection}.
      */
     public void clearHeaders() {
         requestHeaders.clear();
@@ -214,8 +249,9 @@ public abstract class AbstractHttpClient {
     }
 
     /**
-     * Initialize the app-wide {@link CookieManager}. This is all that's necessary to
-     * enable all Web requests within the app to automatically send and receive cookies.
+     * Initialize the app-wide {@link CookieManager}. This is all that's
+     * necessary to enable all Web requests within the app to automatically send
+     * and receive cookies.
      */
     protected static void ensureCookieManager() {
         if (CookieHandler.getDefault() == null) {

@@ -51,6 +51,7 @@ public abstract class AbstractRequestHandler implements RequestHandler {
         urlConnection.setRequestProperty("Accept-Charset", UTF8);
         
         // TODO Make this configurable
+        urlConnection.setConnectTimeout(2000);
         urlConnection.setReadTimeout(2000);
     }
 
@@ -92,7 +93,8 @@ public abstract class AbstractRequestHandler implements RequestHandler {
      *      java.lang.Exception)
      */
     @Override
-    public void onError(HttpURLConnection uc, Exception e) {
+    public void onError(HttpResponse res, Exception e) {
+        System.out.println("AbstractRequestHandler#onError");
         e.printStackTrace();
     }
 

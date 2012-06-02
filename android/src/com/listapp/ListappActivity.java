@@ -96,6 +96,9 @@ public class ListappActivity extends ActionBarActivity implements OnItemClickLis
         listView.setAdapter(adapter);
         listView.setOnItemClickListener(this);
 
+        // TODO force login to debug httpclient 
+        login();
+        
         // TODO two calls to setContentView?
         // moved from onResume
         // final SharedPreferences prefs = Util.getSharedPreferences(mContext);
