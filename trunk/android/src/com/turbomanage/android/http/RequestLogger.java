@@ -30,9 +30,9 @@ public interface RequestLogger {
     /**
      * Logs the HTTP response.
      * 
-     * @param urlConnection
+     * @param httpResponse
      * @throws IOException
      */
-    void logResponse(HttpURLConnection urlConnection) throws IOException;
+    void logResponse(HttpResponse httpResponse);
 
 }
