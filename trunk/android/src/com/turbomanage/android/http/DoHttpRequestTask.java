@@ -11,7 +11,8 @@ import android.os.AsyncTask;
  */
 public class DoHttpRequestTask extends AsyncTask<HttpRequest, Void, HttpResponse> {
 
-    private TaskCallback callback;
+    private AsyncHttpClient client;
+    private AsyncCallback callback;
     private Exception savedException;
 
     /**
@@ -20,7 +21,8 @@ public class DoHttpRequestTask extends AsyncTask<HttpRequest, Void, HttpResponse
      * 
      * @param callback
      */
-    public DoHttpRequestTask(TaskCallback callback) {
+    public DoHttpRequestTask(AsyncHttpClient httpClient, AsyncCallback callback) {
+        this.client = httpClient;
         this.callback = callback;
     }
 
@@ -29,7 +31,7 @@ public class DoHttpRequestTask extends AsyncTask<HttpRequest, Void, HttpResponse
         try {
             if (params != null && params.length > 0) {
                 HttpRequest httpRequest = params[0];
-                return httpRequest.execute();
+                return client.tryMany(httpRequest);
             }
             else {
                 throw new IllegalArgumentException(
