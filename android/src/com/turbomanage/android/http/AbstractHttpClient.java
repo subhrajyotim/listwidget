@@ -4,10 +4,12 @@ package com.turbomanage.android.http;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.ConnectException;
 import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Map;
 import java.util.TreeMap;
@@ -32,21 +34,43 @@ public abstract class AbstractHttpClient {
 
     protected String baseUrl = "";
 
-    private RequestLogger requestLogger;
-    private RequestHandler requestHandler;
+    protected RequestLogger requestLogger;
+    protected RequestHandler requestHandler;
     private Map<String, String> requestHeaders = new TreeMap<String, String>();
+    protected int connectionTimeout = 1000;
+    protected int readTimeout = 1000;
 
     /**
      * Constructs a new client with base URL that will be appended in the
      * request methods. It may be empty or any part of a URL. Examples:
-     * http://turbomanage.com 
-     * http://turbomanage.com:987
+     * http://turbomanage.com http://turbomanage.com:987
      * http://turbomanage.com:987/resources
      * 
      * @param baseUrl
      */
     public AbstractHttpClient(String baseUrl) {
         this.baseUrl = baseUrl;
+    }
+
+    /**
+     * This method wraps the call to doHttpMethod and invokes the custom error
+     * handler in case of HttpRequestException. It may be overridden by other
+     * clients such {@link AsyncHttpClient} in order to wrap the exception
+     * handling for purposes of retries, etc.
+     * 
+     * @param httpRequest
+     * @return Response object
+     */
+    protected HttpResponse execute(HttpRequest httpRequest) {
+        HttpResponse httpResponse = null;
+        try {
+            httpResponse = doHttpMethod(httpRequest.getPath(),
+                    httpRequest.getHttpMethod(), httpRequest.getContentType(),
+                    httpRequest.getContent());
+        } catch (Exception e) {
+            requestHandler.onError(httpResponse, e);
+        }
+        return httpResponse;
     }
 
     /**
@@ -59,9 +83,10 @@ public abstract class AbstractHttpClient {
      * @param contentType MIME type of the request
      * @param content Request data
      * @return Response object
+     * @throws HttpRequestException 
      */
     protected HttpResponse doHttpMethod(String path, HttpMethod httpMethod, String contentType,
-            byte[] content) {
+            byte[] content) throws HttpRequestException {
 
         HttpURLConnection uc = null;
         HttpResponse httpResponse = null;
@@ -70,7 +95,7 @@ public abstract class AbstractHttpClient {
             uc = openConnection(path);
             prepareConnection(uc, httpMethod, contentType);
             // TODO debug read timeout for GETs
-//            uc.setFixedLengthStreamingMode(10);
+             uc.setFixedLengthStreamingMode(10);
             appendRequestHeaders(uc);
             if (requestLogger.isLoggingEnabled()) {
                 requestLogger.logRequest(uc, content);
@@ -83,9 +108,10 @@ public abstract class AbstractHttpClient {
             // Try reading the error stream to populate status code such as 404
             try {
                 httpResponse = readErrorStream(uc);
-                requestHandler.onError(httpResponse, e);
             } catch (Exception ee) {
                 // Swallow to show first cause only
+            } finally {
+                throw new HttpRequestException(e, httpResponse);
             }
         } finally {
             if (requestLogger.isLoggingEnabled()) {
@@ -110,6 +136,8 @@ public abstract class AbstractHttpClient {
 
     protected void prepareConnection(HttpURLConnection urlConnection, HttpMethod httpMethod,
             String contentType) throws IOException {
+        urlConnection.setConnectTimeout(connectionTimeout);
+        urlConnection.setReadTimeout(readTimeout);
         requestHandler.prepareConnection(urlConnection, httpMethod, contentType);
     }
 
@@ -141,9 +169,11 @@ public abstract class AbstractHttpClient {
             }
             return uc.getResponseCode();
         } finally {
-            // TODO nested try-catch not necessary since method throws IOException
+            // TODO nested try-catch not necessary since method throws
+            // IOException
             // May want to wrap & swallow to avoid dup exceptions
-            // Without a catch cause above, the close exception occurs before orig bubbles up
+            // Without a catch cause above, the close exception occurs before
+            // orig bubbles up
             if (out != null) {
                 try {
                     out.close();
@@ -257,6 +287,37 @@ public abstract class AbstractHttpClient {
         if (CookieHandler.getDefault() == null) {
             CookieHandler.setDefault(new CookieManager());
         }
+    }
+    
+    protected boolean isTimeoutException(Throwable t) {
+        if (t instanceof SocketTimeoutException || t instanceof ConnectException) {
+            // This one happens right away, probably also EHOSTUNREACH
+            // Should we measure elapsed time and return false if it's immediate?
+            if (t.getMessage().contains("ECONNREFUSED")) {
+                return false;
+            }
+            return true;
+        } else if (t.getCause() == null) {
+            return false;
+        } else {
+            return isTimeoutException(t.getCause());
+        }
+    }
+
+    public int getConnectionTimeout() {
+        return connectionTimeout;
+    }
+
+    public void setConnectionTimeout(int connectionTimeout) {
+        this.connectionTimeout = connectionTimeout;
+    }
+
+    public int getReadTimeout() {
+        return readTimeout;
+    }
+
+    public void setReadTimeout(int readTimeout) {
+        this.readTimeout = readTimeout;
     }
 
 }

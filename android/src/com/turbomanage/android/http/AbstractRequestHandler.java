@@ -49,10 +49,6 @@ public abstract class AbstractRequestHandler implements RequestHandler {
         }
         // Set additional properties
         urlConnection.setRequestProperty("Accept-Charset", UTF8);
-        
-        // TODO Make this configurable
-        urlConnection.setConnectTimeout(2000);
-        urlConnection.setReadTimeout(2000);
     }
 
     /**

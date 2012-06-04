@@ -45,7 +45,7 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse get(String path, ParameterMap params) {
-        return new HttpGetRequest(this, path, params).execute();
+        return execute(new HttpGetRequest(path, params));
     }
 
     /**
@@ -56,7 +56,7 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse post(String path, ParameterMap params) {
-        return new HttpPostRequest(this, path, params).execute();
+        return execute(new HttpPostRequest(path, params));
     }
 
     /**
@@ -70,7 +70,7 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse post(String path, String contentType, byte[] data) {
-        return new HttpPostRequest(this, path, contentType, data).execute();
+        return execute(new HttpPostRequest(path, contentType, data));
     }
 
     /**
@@ -82,7 +82,7 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse put(String path, String contentType, byte[] data) {
-        return new HttpPutRequest(this, path, contentType, data).execute();
+        return execute(new HttpPutRequest(path, contentType, data));
     }
 
     /**
@@ -95,7 +95,7 @@ public class BasicHttpClient extends AbstractHttpClient {
      * @return Response object
      */
     public HttpResponse delete(String path, ParameterMap params) {
-        return new HttpDeleteRequest(this, path, params).execute();
+        return execute(new HttpDeleteRequest(path, params));
     }
 
 }
