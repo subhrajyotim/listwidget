@@ -38,7 +38,7 @@ public abstract class AbstractHttpClient {
     protected RequestHandler requestHandler;
     private Map<String, String> requestHeaders = new TreeMap<String, String>();
     protected int connectionTimeout = 1000;
-    protected int readTimeout = 1000;
+    protected int readTimeout = 5000;
 
     /**
      * Constructs a new client with base URL that will be appended in the
