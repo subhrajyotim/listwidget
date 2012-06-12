@@ -97,7 +97,7 @@ public class ListappActivity extends ActionBarActivity implements OnItemClickLis
         listView.setOnItemClickListener(this);
 
         // TODO force login to debug httpclient 
-        login();
+//        login();
         
         // TODO two calls to setContentView?
         // moved from onResume

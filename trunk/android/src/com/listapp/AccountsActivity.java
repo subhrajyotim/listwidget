@@ -35,9 +35,9 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.turbomanage.android.http.BasicHttpClient;
-import com.turbomanage.android.http.HttpResponse;
-import com.turbomanage.android.http.ParameterMap;
+import com.turbomanage.httpclient.HttpResponse;
+import com.turbomanage.httpclient.ParameterMap;
+import com.turbomanage.httpclient.android.AndroidHttpClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -190,7 +190,7 @@ public class AccountsActivity extends Activity {
         editor.putString(Util.ACCOUNT_NAME, accountName);
         editor.remove(Util.DEVICE_REGISTRATION_ID);
         editor.commit();
-        BasicHttpClient.getCookieManager().getCookieStore().removeAll();
+        AndroidHttpClient.getCookieManager().getCookieStore().removeAll();
 
         // Obtain an auth token and register
         final AccountManager mgr = AccountManager.get(mContext);
@@ -233,7 +233,7 @@ public class AccountsActivity extends Activity {
     }
 
     public void loginDev(String userEmail) {
-        BasicHttpClient httpClient = new BasicHttpClient(Util.getBaseUrl(this));
+        AndroidHttpClient httpClient = new AndroidHttpClient(Util.getBaseUrl(this));
         ParameterMap params = httpClient.newParams()
                 .add("continue", "/")
                 .add("email", userEmail)
@@ -242,10 +242,11 @@ public class AccountsActivity extends Activity {
     }
 
     public void loginProd(String authToken) {
-        BasicHttpClient httpClient = new BasicHttpClient(Util.getBaseUrl(this));
+        AndroidHttpClient httpClient = new AndroidHttpClient(Util.getBaseUrl(this));
         ParameterMap params = httpClient.newParams()
                 .add("auth", authToken);
-        httpClient.get("/_ah/login", params);
+        HttpResponse httpResponse = httpClient.get("/_ah/login", params);
+        System.out.println(httpResponse.getBodyAsString());
     }
 
     private String getAuthToken(AccountManagerFuture<Bundle> future) {
