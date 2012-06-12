@@ -31,4 +31,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>com.google.gdt.eclipse.appengine.rpc.appengineConnectedNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>httpclient-src</name>
+			<type>2</type>
+			<location>/Users/drfibonacci/code/basic-http-client/src</location>
+		</link>
+	</linkedResources>
 </projectDescription>
